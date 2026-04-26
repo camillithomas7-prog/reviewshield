@@ -1,11 +1,17 @@
 AddType application/javascript .js
 AddType text/css .css
 
+# Disabilita content-negotiation che su alcuni hosting (Hostinger) interferisce con SPA fallback
+Options -MultiViews
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+
+  # Lascia passare richieste a file/cartelle che esistono davvero (asset, favicon, ecc.)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Tutto il resto -> /index.html (SPA fallback per /admin, /admin/dashboard, ecc.)
+  RewriteRule ^ /index.html [L]
 </IfModule>
