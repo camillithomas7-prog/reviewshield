@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Gestione Lead — ReviewShield Admin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<style>
+:root{
+  --bg:#030014;
+  --card:rgba(255,255,255,.02);
+  --card-strong:rgba(255,255,255,.04);
+  --border:rgba(255,255,255,.06);
+  --primary:#7c3aed;
+  --primary-soft:rgba(124,58,237,.1);
+  --accent:#06b6d4;
+  --green:#22c55e;
+  --yellow:#eab308;
+  --orange:#f97316;
+  --red:#ef4444;
+  --text:rgba(255,255,255,.65);
+  --text-strong:rgba(255,255,255,.85);
+  --muted:rgba(255,255,255,.3);
+  --white:#fff;
+  --font:'Inter',-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;min-height:100vh}
+body{padding:18px 22px 80px}
+.wrap{max-width:1200px;margin:0 auto}
+
+/* Login */
+.login-card{max-width:380px;margin:80px auto;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px}
+.login-card h1{color:var(--white);font-size:20px;font-weight:800;margin-bottom:6px}
+.login-card p{font-size:13px;color:var(--muted);margin-bottom:18px}
+.login-card label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin:12px 0 6px}
+.login-card input{width:100%;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:inherit;font-size:14px}
+.login-card input:focus{outline:none;border-color:var(--primary)}
+.login-card button{width:100%;margin-top:18px;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.login-card button:hover{background:#6d28d9}
+.login-card .err{color:var(--red);font-size:12px;margin-top:10px;min-height:16px}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+.brand-title{font-size:15px;font-weight:800;color:var(--white)}
+.brand-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;font-weight:600}
+.nav a:hover{color:var(--white);border-color:rgba(124,58,237,.4)}
+.nav a.active{background:var(--primary-soft);color:var(--accent);border-color:rgba(124,58,237,.3)}
+.user-bar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.user-bar button{background:transparent;color:var(--muted);border:1px solid var(--border);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.user-bar button:hover{color:var(--red);border-color:rgba(239,68,68,.3)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;transition:border-color .15s;font-family:inherit}
+.stat:hover{border-color:rgba(124,58,237,.3)}
+.stat.active{border-color:var(--primary);background:var(--primary-soft)}
+.stat .num{font-size:22px;font-weight:800;line-height:1}
+.stat .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:4px;font-weight:600}
+.stat .num.c-blue{color:#3b82f6}
+.stat .num.c-yel{color:var(--yellow)}
+.stat .num.c-red{color:var(--red)}
+.stat .num.c-org{color:var(--orange)}
+.stat .num.c-grn{color:var(--green)}
+.stat .num.c-cyn{color:var(--accent)}
+.stat .num.c-pur{color:var(--primary)}
+.stat .num.c-mut{color:var(--muted)}
+.stat .num.c-wht{color:var(--white)}
+
+/* Filter pills */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:5px 11px;background:var(--card);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--text);cursor:pointer;font-weight:600;font-family:inherit;text-transform:uppercase;letter-spacing:.04em}
+.pill:hover{color:var(--white)}
+.pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pill.team-pill.active{background:var(--accent);border-color:var(--accent)}
+
+/* Search */
+.search-bar{margin-bottom:14px}
+.search-bar input{width:100%;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-family:inherit}
+.search-bar input:focus{outline:none;border-color:var(--primary)}
+
+/* Cards */
+.lead-list{display:flex;flex-direction:column;gap:10px}
+.lead{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:12px;padding:14px 16px;scroll-margin-top:14px}
+.lead.s-da_contattare{border-left-color:#3b82f6}
+.lead.s-da_ricontattare{border-left-color:var(--orange)}
+.lead.s-interessato{border-left-color:var(--yellow)}
+.lead.s-demo_avviata{border-left-color:var(--accent)}
+.lead.s-convertito{border-left-color:var(--green)}
+.lead.s-non_interessato{border-left-color:var(--muted)}
+.lead.s-non_risponde{border-left-color:#a855f7}
+.lead.s-numero_sbagliato{border-left-color:var(--red)}
+.lead-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.lead-name{font-size:15px;font-weight:700;color:var(--white)}
+.lead-name .icn{margin-right:6px}
+.lead-meta{display:flex;flex-direction:column;align-items:flex-end;font-size:11px;color:var(--muted);text-align:right}
+.lead-meta .id{font-weight:700;color:var(--text)}
+.lead-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px 14px;margin-bottom:10px;font-size:12px}
+.lead-info .field{display:flex;flex-direction:column}
+.lead-info .field .lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:2px}
+.lead-info .field .val{color:var(--text-strong);font-size:12px;font-weight:600}
+.lead-info .field .val a{color:var(--accent);text-decoration:none}
+.lead-info .field .val a:hover{text-decoration:underline}
+.tags{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tag{font-size:9px;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.tag.gray{background:rgba(255,255,255,.05);color:var(--muted)}
+.tag.red{background:rgba(239,68,68,.12);color:var(--red)}
+.tag.green{background:rgba(34,197,94,.12);color:var(--green)}
+.tag.yel{background:rgba(234,179,8,.12);color:var(--yellow)}
+.tag.cyn{background:rgba(6,182,212,.12);color:var(--accent)}
+.tag.pur{background:rgba(124,58,237,.12);color:#a78bfa}
+.tag.org{background:rgba(249,115,22,.12);color:var(--orange)}
+.neg-rev{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11.5px;color:rgba(239,68,68,.85);line-height:1.5}
+.neg-rev .nr-head{font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:4px}
+
+.notes{width:100%;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text-strong);font-size:12px;font-family:inherit;resize:vertical;min-height:38px;margin-bottom:8px}
+.notes:focus{outline:none;border-color:var(--primary)}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.row-actions select,.row-actions input[type="datetime-local"]{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text-strong);padding:6px 9px;border-radius:7px;font-size:11px;font-family:inherit}
+.row-actions select:focus,.row-actions input:focus{outline:none;border-color:var(--primary)}
+.btn{padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;color:var(--text-strong);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
+.btn:hover{background:rgba(255,255,255,.06);color:var(--white)}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{background:#6d28d9}
+.btn.wa{background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.25)}
+.btn.wa:hover{background:rgba(34,197,94,.2)}
+.btn.del{background:rgba(239,68,68,.08);color:var(--red);border-color:rgba(239,68,68,.2)}
+.btn.del:hover{background:rgba(239,68,68,.15)}
+.btn-rec{background:#dc2626;color:#fff;border:1px solid #dc2626;padding:7px 13px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-rec:hover{background:#b91c1c;border-color:#b91c1c}
+.btn-rec.recording{background:#7f1d1d;border-color:#7f1d1d;animation:pulse-rec 1.2s infinite}
+.btn-rec:disabled{opacity:.6;cursor:wait}
+@keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+.recordings{background:rgba(255,255,255,.015);border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.recordings .rec-empty{font-size:11px;color:var(--muted);font-style:italic}
+.rec-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.rec-item:last-child{border-bottom:0}
+.rec-item audio{flex:1;height:30px}
+.rec-item .rec-meta{font-size:10px;color:var(--muted);min-width:140px}
+.rec-item .rec-del{background:transparent;border:0;color:var(--red);cursor:pointer;font-size:13px;padding:3px 5px;font-family:inherit}
+
+.log{background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:10.5px;color:var(--muted);max-height:80px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;line-height:1.6}
+
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:60px 20px}
+.empty span{display:block;font-size:24px;margin-bottom:10px}
+
+.reminder-bar{background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(239,68,68,.08));border:1px solid rgba(249,115,22,.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:none}
+.reminder-bar.active{display:block}
+.reminder-bar h3{color:var(--orange);font-size:13px;font-weight:800;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.reminder-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;color:var(--text-strong);border-bottom:1px solid rgba(249,115,22,.1)}
+.reminder-item:last-child{border-bottom:0}
+.reminder-item a{color:var(--accent);text-decoration:none;font-weight:700}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;display:none;box-shadow:0 4px 20px rgba(124,58,237,.4)}
+.toast.err{background:var(--red)}
+.toast.show{display:block;animation:tIn .25s}
+@keyframes tIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+
+@media(max-width:600px){
+  body{padding:14px}
+  .lead-info{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="display:none">
+  <div class="login-card">
+    <h1>🛡️ Gestione Lead</h1>
+    <p>ReviewShield Admin — accedi con il tuo account Supabase per vedere i lead salvati.</p>
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="samuelehk@gmail.com" autocomplete="email">
+    <label>Password</label>
+    <input type="password" id="login-password" autocomplete="current-password">
+    <button id="login-btn" type="button">Accedi</button>
+    <div class="err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="main-screen" style="display:none">
+  <div class="wrap">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-mark">🛡</div>
+        <div>
+          <div class="brand-title">ReviewShield Admin</div>
+          <div class="brand-sub">Gestione Lead</div>
+        </div>
+      </div>
+      <div class="nav">
+        <a href="/admin/dashboard/">← Lead Salvati (React)</a>
+        <a href="/admin/gestione/" class="active">Gestione</a>
+        <a href="/admin/sop.html">SOP</a>
+        <a href="/admin/script-vendita.html">Script</a>
+      </div>
+      <div class="user-bar">
+        <span id="user-email"></span>
+        <button id="logout-btn">Esci</button>
+      </div>
+    </div>
+
+    <div class="reminder-bar" id="reminder-bar">
+      <h3>📞 Da chiamare adesso</h3>
+      <div id="reminder-list"></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="pill-row" id="status-pills"></div>
+    <div class="pill-row" id="team-pills"></div>
+
+    <div class="search-bar">
+      <input id="search" placeholder="🔎 Cerca per nome, telefono, città…">
+    </div>
+
+    <div class="lead-list" id="lead-list">
+      <div class="empty">⏳ Caricamento lead…</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+
+const SUPABASE_URL = 'https://amxoxllnhcgprmfrmnho.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFteG94bGxuaGNncHJtZnJtbmhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MTMxNjQsImV4cCI6MjA5MDk4OTE2NH0.60JGHtG7bCFevYyJr-q2Og9poNbT1QUnZZCYBT6E2c8';
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: true, autoRefreshToken: true } });
+
+const TEAMS = ['samuele', 'thomas'];
+const STATUS_OPTIONS = [
+  { value: 'da_contattare',   label: 'Da contattare',   class: 'tag gray',  pillColor: 'c-blue' },
+  { value: 'da_ricontattare', label: 'Da ricontattare', class: 'tag org',   pillColor: 'c-org'  },
+  { value: 'non_risponde',    label: 'Non risponde',    class: 'tag pur',   pillColor: 'c-pur'  },
+  { value: 'interessato',     label: 'Interessato',     class: 'tag yel',   pillColor: 'c-yel'  },
+  { value: 'demo_avviata',    label: 'Demo avviata',    class: 'tag cyn',   pillColor: 'c-cyn'  },
+  { value: 'convertito',      label: 'Convertito',      class: 'tag green', pillColor: 'c-grn'  },
+  { value: 'non_interessato', label: 'Non interessato', class: 'tag gray',  pillColor: 'c-mut'  },
+  { value: 'numero_sbagliato',label: 'Numero sbagliato',class: 'tag red',   pillColor: 'c-red'  },
+];
+
+let allLeads = [];
+let currentUser = null;
+let currentFilter = { status: null, team: null, search: '' };
+
+// ============= LOCAL MGMT METADATA =============
+// Stored in localStorage keyed by lead.id (google_place_id is also unique).
+// Schema: { team, reminder, log: [{ts, by, text}], nr_count }
+function mgmtKey(leadId){ return 'rs_mgmt_'+leadId; }
+function getMgmt(leadId){
+  try { return JSON.parse(localStorage.getItem(mgmtKey(leadId))||'{}'); }
+  catch(e){ return {}; }
+}
+function setMgmt(leadId, data){
+  localStorage.setItem(mgmtKey(leadId), JSON.stringify(data));
+}
+function logActivity(leadId, text){
+  const m = getMgmt(leadId);
+  if (!m.log) m.log = [];
+  m.log.unshift({ ts: new Date().toISOString(), by: (currentUser?.email||'').split('@')[0], text });
+  if (m.log.length > 30) m.log = m.log.slice(0, 30);
+  setMgmt(leadId, m);
+}
+
+// ============= INDEXEDDB FOR RECORDINGS =============
+const IDB_NAME = 'rs_recordings_db';
+const IDB_STORE = 'recordings';
+let __db = null;
+function openDB(){
+  if (__db) return Promise.resolve(__db);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)){
+        const store = db.createObjectStore(IDB_STORE, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('lead_id', 'lead_id', { unique: false });
+      }
+    };
+    req.onsuccess = () => { __db = req.result; resolve(__db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+async function saveRecording(leadId, blob, durata){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const store = tx.objectStore(IDB_STORE);
+    const req = store.add({
+      lead_id: leadId,
+      blob,
+      durata,
+      created_at: new Date().toISOString(),
+      operatore: (currentUser?.email||'').split('@')[0],
+    });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function listRecordings(leadId){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const idx = tx.objectStore(IDB_STORE).index('lead_id');
+    const req = idx.getAll(leadId);
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function deleteRecording(recId){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const req = tx.objectStore(IDB_STORE).delete(recId);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ============= AUTH =============
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (session && session.user){
+    currentUser = session.user;
+    showMain();
+  } else {
+    showLogin();
+  }
+}
+function showLogin(){
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('main-screen').style.display = 'none';
+}
+function showMain(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  document.getElementById('user-email').textContent = currentUser.email;
+  loadLeads();
+}
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-err');
+  errEl.textContent = '';
+  if (!email || !pwd) { errEl.textContent = 'Email e password obbligatori'; return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Accesso…';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  btn.disabled = false; btn.textContent = 'Accedi';
+  if (error) { errEl.textContent = error.message; return; }
+  currentUser = data.user;
+  showMain();
+});
+document.getElementById('login-password').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  currentUser = null;
+  location.reload();
+});
+
+// ============= LOAD LEADS =============
+async function loadLeads(){
+  const list = document.getElementById('lead-list');
+  list.innerHTML = '<div class="empty">⏳ Caricamento lead…</div>';
+  const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false }).limit(5000);
+  if (error){
+    list.innerHTML = '<div class="empty"><span>⚠️</span>'+error.message+'</div>';
+    return;
+  }
+  allLeads = data || [];
+  render();
+}
+
+// ============= RENDER =============
+function fmtPhone(p){
+  return (p||'').toString();
+}
+function waLink(phone, text=''){
+  let d = (phone||'').replace(/[^0-9]/g, '');
+  if (d.startsWith('00')) d = d.slice(2);
+  if (/^3\d{8,9}$/.test(d)) d = '39'+d;
+  return 'https://web.whatsapp.com/send?phone='+d + (text? '&text='+encodeURIComponent(text):'');
+}
+function fmtDate(d){
+  if (!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit', year:'2-digit'}) + ' ' +
+         dt.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+}
+function isToday(iso){
+  if (!iso) return false;
+  const d = new Date(iso), n = new Date();
+  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+}
+function isExpired(iso){
+  if (!iso) return false;
+  return new Date(iso).getTime() < Date.now();
+}
+
+function statusOption(value){
+  return STATUS_OPTIONS.find(s => s.value === value) || STATUS_OPTIONS[0];
+}
+
+function applyFilter(leads){
+  let out = leads;
+  if (currentFilter.status === 'oggi'){
+    out = out.filter(l => isToday(l.created_at));
+  } else if (currentFilter.status === 'scaduti'){
+    out = out.filter(l => {
+      const m = getMgmt(l.id);
+      return m.reminder && isExpired(m.reminder) && !['convertito','non_interessato'].includes(l.status);
+    });
+  } else if (currentFilter.status){
+    out = out.filter(l => (l.status||'da_contattare') === currentFilter.status);
+  }
+  if (currentFilter.team){
+    out = out.filter(l => (getMgmt(l.id).team||'') === currentFilter.team);
+  }
+  if (currentFilter.search){
+    const q = currentFilter.search.toLowerCase();
+    out = out.filter(l =>
+      (l.business_name||'').toLowerCase().includes(q) ||
+      (l.phone||'').toLowerCase().includes(q) ||
+      (l.address||'').toLowerCase().includes(q) ||
+      (l.city||'').toLowerCase().includes(q)
+    );
+  }
+  return out;
+}
+
+function render(){
+  renderStats();
+  renderPills();
+  renderTeamPills();
+  renderReminders();
+  renderList();
+}
+
+function renderStats(){
+  const el = document.getElementById('stats');
+  const counts = {
+    totali: allLeads.length,
+    oggi: allLeads.filter(l => isToday(l.created_at)).length,
+    scaduti: allLeads.filter(l => {
+      const m = getMgmt(l.id);
+      return m.reminder && isExpired(m.reminder) && !['convertito','non_interessato'].includes(l.status);
+    }).length,
+  };
+  STATUS_OPTIONS.forEach(s => {
+    counts[s.value] = allLeads.filter(l => (l.status||'da_contattare') === s.value).length;
+  });
+  const items = [
+    { key: null,                  num: counts.totali,            label: 'Totali',        col: 'c-wht' },
+    { key: 'oggi',                num: counts.oggi,              label: 'Oggi',          col: 'c-yel' },
+    { key: 'scaduti',             num: counts.scaduti,           label: 'Scaduti',       col: 'c-red' },
+    { key: 'da_contattare',       num: counts.da_contattare,     label: 'Da Contatt.',   col: 'c-blue' },
+    { key: 'da_ricontattare',     num: counts.da_ricontattare,   label: 'Da Ricontatt.', col: 'c-org' },
+    { key: 'non_risponde',        num: counts.non_risponde,      label: 'Non Risp.',     col: 'c-pur' },
+    { key: 'interessato',         num: counts.interessato,       label: 'Interessati',   col: 'c-yel' },
+    { key: 'demo_avviata',        num: counts.demo_avviata,      label: 'Demo',          col: 'c-cyn' },
+    { key: 'convertito',          num: counts.convertito,        label: 'Convertiti',    col: 'c-grn' },
+    { key: 'non_interessato',     num: counts.non_interessato,   label: 'Non Inter.',    col: 'c-mut' },
+    { key: 'numero_sbagliato',    num: counts.numero_sbagliato,  label: 'N. Sbagliato',  col: 'c-red' },
+  ];
+  el.innerHTML = items.map(it => `
+    <button class="stat ${currentFilter.status === it.key ? 'active' : ''}" data-key="${it.key||''}">
+      <div class="num ${it.col}">${it.num}</div>
+      <div class="lbl">${it.label}</div>
+    </button>
+  `).join('');
+  el.querySelectorAll('.stat').forEach(b => {
+    b.addEventListener('click', () => {
+      currentFilter.status = b.dataset.key || null;
+      render();
+    });
+  });
+}
+
+function renderPills(){
+  const el = document.getElementById('status-pills');
+  const items = [
+    { key: null, label: 'Tutti' },
+    { key: 'oggi', label: 'Oggi' },
+    { key: 'da_contattare', label: 'Da Contattare' },
+    { key: 'da_ricontattare', label: 'Da Ricontattare' },
+    { key: 'non_risponde', label: 'Non Risponde' },
+    { key: 'interessato', label: 'Interessati' },
+    { key: 'demo_avviata', label: 'Demo' },
+    { key: 'convertito', label: 'Convertiti' },
+    { key: 'non_interessato', label: 'Non Interessati' },
+    { key: 'numero_sbagliato', label: 'N. Sbagliato' },
+    { key: 'scaduti', label: 'Scaduti' },
+  ];
+  el.innerHTML = items.map(it => `
+    <button class="pill ${currentFilter.status === it.key ? 'active' : ''}" data-key="${it.key||''}">${it.label}</button>
+  `).join('');
+  el.querySelectorAll('.pill').forEach(b => {
+    b.addEventListener('click', () => {
+      currentFilter.status = b.dataset.key || null;
+      render();
+    });
+  });
+}
+
+function renderTeamPills(){
+  const el = document.getElementById('team-pills');
+  const counts = { samuele: 0, thomas: 0 };
+  allLeads.forEach(l => {
+    const t = getMgmt(l.id).team;
+    if (t && counts[t] !== undefined) counts[t]++;
+  });
+  el.innerHTML = `
+    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;align-self:center;margin-right:6px">Team:</span>
+    ${TEAMS.map(t => `
+      <button class="pill team-pill ${currentFilter.team === t ? 'active' : ''}" data-team="${t}">
+        ${t.charAt(0).toUpperCase()+t.slice(1)} (${counts[t]||0})
+      </button>
+    `).join('')}
+    <button class="pill team-pill ${currentFilter.team === '__none' ? 'active' : ''}" data-team="__none">Non assegnati</button>
+  `;
+  el.querySelectorAll('.team-pill').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.dataset.team;
+      if (t === '__none'){
+        currentFilter.team = currentFilter.team === '__none' ? null : '__none';
+      } else {
+        currentFilter.team = currentFilter.team === t ? null : t;
+      }
+      render();
+    });
+  });
+}
+
+function renderReminders(){
+  const bar = document.getElementById('reminder-bar');
+  const list = document.getElementById('reminder-list');
+  const due = allLeads.filter(l => {
+    const m = getMgmt(l.id);
+    return m.reminder && isExpired(m.reminder) && !['convertito','non_interessato'].includes(l.status);
+  });
+  if (due.length === 0){ bar.classList.remove('active'); return; }
+  bar.classList.add('active');
+  list.innerHTML = due.map(l => `
+    <div class="reminder-item">
+      <span><strong>${escapeHtml(l.business_name||'—')}</strong> — ${escapeHtml(l.phone||'—')}</span>
+      <a href="#lead-${l.id}">Apri →</a>
+    </div>
+  `).join('');
+}
+
+function renderList(){
+  const list = document.getElementById('lead-list');
+  const filtered = applyFilter(allLeads);
+  if (filtered.length === 0){
+    list.innerHTML = '<div class="empty"><span>📭</span>Nessun lead trovato con questi filtri.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(renderLeadCard).join('');
+  // Wire events
+  filtered.forEach(l => wireLead(l));
+  // Load recordings async per visible lead
+  filtered.forEach(l => refreshRecordings(l.id));
+}
+
+function escapeHtml(s){
+  return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderLeadCard(l){
+  const status = l.status || 'da_contattare';
+  const opt = statusOption(status);
+  const m = getMgmt(l.id);
+  const team = m.team || '';
+  const reminder = m.reminder || '';
+  const log = m.log || [];
+  const nrCount = m.nr_count || 0;
+  const negRevs = Array.isArray(l.negative_reviews) ? l.negative_reviews : [];
+  const ratingStr = l.rating ? `⭐ ${Number(l.rating).toFixed(1)} (${l.total_reviews||0})` : '—';
+  const tags = [
+    `<span class="${opt.class}">${opt.label}</span>`,
+    nrCount>0 ? `<span class="tag red">NR ${nrCount}</span>` : '',
+    team ? `<span class="tag pur">${team.toUpperCase()}</span>` : '',
+    negRevs.length>0 ? `<span class="tag red">${negRevs.length} REC. NEG.</span>` : '',
+    l.has_website===false ? `<span class="tag yel">NO SITO</span>` : '',
+  ].filter(Boolean).join('');
+  const negBlock = negRevs.length > 0 ? `
+    <div class="neg-rev">
+      <div class="nr-head">${negRevs.length} recensione/i negativa/e</div>
+      ${negRevs.slice(0,2).map(r => `
+        <div>${'⭐'.repeat(Math.max(1, Math.min(5, Number(r.rating)||1)))} <strong>${escapeHtml(r.author||r.author_name||'')}</strong>: ${escapeHtml((r.text||'').slice(0,180))}${(r.text||'').length>180?'…':''}</div>
+      `).join('')}
+    </div>
+  ` : '';
+  return `
+    <div class="lead s-${status}" id="lead-${l.id}">
+      <div class="lead-row">
+        <div class="lead-name"><span class="icn">📞</span>${escapeHtml(l.business_name||'—')}</div>
+        <div class="lead-meta">
+          <div class="id">#${(l.id||'').toString().slice(-6)}</div>
+          <div>${fmtDate(l.created_at)}</div>
+        </div>
+      </div>
+      <div class="lead-info">
+        <div class="field"><span class="lbl">Telefono</span><span class="val">${l.phone ? `<a href="tel:${escapeHtml(l.phone)}">${escapeHtml(l.phone)}</a>` : '—'}</span></div>
+        <div class="field"><span class="lbl">Città</span><span class="val">${escapeHtml((l.city||'')+(l.province?' ('+l.province+')':''))||'—'}</span></div>
+        <div class="field"><span class="lbl">Sito</span><span class="val">${l.website ? `<a href="${escapeHtml(l.website)}" target="_blank" rel="noopener">${escapeHtml((l.website||'').replace(/^https?:\/\//,'').slice(0,40))}</a>` : '<span style="color:var(--muted)">—</span>'}</span></div>
+        <div class="field"><span class="lbl">Rating</span><span class="val">${ratingStr}</span></div>
+        <div class="field"><span class="lbl">Indirizzo</span><span class="val">${escapeHtml(l.address||'—')}</span></div>
+        <div class="field"><span class="lbl">Maps</span><span class="val">${l.google_maps_url ? `<a href="${escapeHtml(l.google_maps_url)}" target="_blank" rel="noopener">Apri Google Maps</a>` : '—'}</span></div>
+      </div>
+      <div class="tags">${tags}</div>
+      ${negBlock}
+      <textarea class="notes" data-id="${l.id}" placeholder="Note sul lead…">${escapeHtml(l.notes||'')}</textarea>
+      <div class="row-actions">
+        <select class="sel-status" data-id="${l.id}">
+          ${STATUS_OPTIONS.map(s => `<option value="${s.value}" ${s.value===status?'selected':''}>${s.label}</option>`).join('')}
+        </select>
+        <select class="sel-team" data-id="${l.id}">
+          <option value="">— team —</option>
+          ${TEAMS.map(t => `<option value="${t}" ${team===t?'selected':''}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join('')}
+        </select>
+        <input type="datetime-local" class="inp-reminder" data-id="${l.id}" value="${reminder ? reminder.slice(0,16) : ''}" title="Prossimo contatto">
+        <button class="btn save-meta" data-id="${l.id}">💾 Salva</button>
+        ${l.phone ? `<a class="btn wa" href="${waLink(l.phone)}" target="_blank" rel="noopener">📱 WhatsApp</a>` : ''}
+        <button class="btn btn-rec" data-id="${l.id}">🎙️ Registra Chiamata</button>
+      </div>
+      <div class="recordings" data-id="${l.id}"><div class="rec-empty">Nessuna registrazione</div></div>
+      <div class="log">${log.length===0 ? '<em style="color:var(--muted)">Nessuna attività</em>' : log.slice(0,8).map(e => `${fmtDate(e.ts)} · ${escapeHtml(e.by||'')} · ${escapeHtml(e.text||'')}`).join('<br>')}</div>
+    </div>
+  `;
+}
+
+function wireLead(l){
+  const card = document.getElementById('lead-'+l.id);
+  if (!card) return;
+  card.querySelector('.save-meta').addEventListener('click', async () => {
+    const status = card.querySelector('.sel-status').value;
+    const team = card.querySelector('.sel-team').value;
+    const reminder = card.querySelector('.inp-reminder').value;
+    const notes = card.querySelector('.notes').value;
+    const m = getMgmt(l.id);
+    const oldStatus = l.status || 'da_contattare';
+    const oldTeam = m.team || '';
+    const oldReminder = m.reminder || '';
+    const oldNotes = l.notes || '';
+
+    // Save mgmt locally
+    if (team !== oldTeam){ logActivity(l.id, 'Team: '+(oldTeam||'—')+' → '+(team||'—')); }
+    if (reminder !== oldReminder){ logActivity(l.id, 'Reminder: '+(reminder||'rimosso')); }
+    m.team = team;
+    m.reminder = reminder ? new Date(reminder).toISOString() : '';
+    if (status === 'non_risponde' && oldStatus !== 'non_risponde'){
+      m.nr_count = (m.nr_count||0) + 1;
+      logActivity(l.id, 'Tentativo NR #'+m.nr_count);
+    } else if (['interessato','demo_avviata','convertito'].includes(status)){
+      m.nr_count = 0;
+    }
+    setMgmt(l.id, m);
+
+    // Save status & notes to Supabase
+    if (status !== oldStatus || notes !== oldNotes){
+      const upd = {};
+      if (status !== oldStatus){ upd.status = status; logActivity(l.id, 'Stato: '+statusOption(oldStatus).label+' → '+statusOption(status).label); }
+      if (notes !== oldNotes){ upd.notes = notes; logActivity(l.id, 'Nota aggiornata'); }
+      const { error } = await sb.from('leads').update(upd).eq('id', l.id);
+      if (error){ toast('Errore salvataggio: '+error.message, true); return; }
+      l.status = status;
+      l.notes = notes;
+    }
+    toast('✓ Salvato');
+    render();
+    setTimeout(() => { const c = document.getElementById('lead-'+l.id); if (c) c.scrollIntoView({behavior:'smooth', block:'center'}); }, 50);
+  });
+  card.querySelector('.btn-rec').addEventListener('click', (e) => toggleRec(l.id, e.currentTarget));
+}
+
+async function refreshRecordings(leadId){
+  const wrap = document.querySelector(`.recordings[data-id="${CSS.escape(leadId)}"]`);
+  if (!wrap) return;
+  let recs = [];
+  try { recs = await listRecordings(leadId); } catch(e){ console.warn(e); }
+  if (recs.length === 0){
+    wrap.innerHTML = '<div class="rec-empty">Nessuna registrazione</div>';
+    return;
+  }
+  recs.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  wrap.innerHTML = recs.map(r => {
+    const url = URL.createObjectURL(r.blob);
+    const m = Math.floor((r.durata||0)/60), s = (r.durata||0)%60;
+    return `
+      <div class="rec-item" data-rec-id="${r.id}">
+        <div class="rec-meta">${fmtDate(r.created_at)}<br>${m}:${s<10?'0':''}${s} · ${r.operatore||''}</div>
+        <audio controls preload="none" src="${url}"></audio>
+        <button class="rec-del" title="Elimina" data-rec-id="${r.id}">🗑</button>
+      </div>
+    `;
+  }).join('');
+  wrap.querySelectorAll('.rec-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Eliminare questa registrazione?')) return;
+      await deleteRecording(parseInt(btn.dataset.recId));
+      logActivity(leadId, 'Registrazione chiamata eliminata');
+      refreshRecordings(leadId);
+      render();
+    });
+  });
+}
+
+// ============= RECORDING =============
+let __rec = null;
+async function toggleRec(leadId, btn){
+  if (__rec){
+    if (__rec.leadId !== leadId){ alert('Ferma prima la registrazione del lead in corso.'); return; }
+    __rec.recorder.stop();
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('Browser non supporta la registrazione audio'); return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}});
+    let opts = { audioBitsPerSecond: 32000 };
+    try { opts.mimeType = 'audio/webm;codecs=opus'; } catch(e){}
+    const recorder = new MediaRecorder(stream, opts);
+    const chunks = [];
+    const startTime = Date.now();
+    recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    const state = { leadId, recorder, stream, chunks, startTime, btn };
+    __rec = state;
+    state.timerInterval = setInterval(() => {
+      const s = Math.floor((Date.now() - startTime)/1000);
+      const m = Math.floor(s/60), sec = s%60;
+      btn.innerHTML = '⏹️ Stop '+m+':'+(sec<10?'0':'')+sec;
+    }, 500);
+    recorder.onstop = async () => {
+      clearInterval(state.timerInterval);
+      stream.getTracks().forEach(t => t.stop());
+      btn.classList.remove('recording');
+      btn.innerHTML = '⏳ Salvataggio…'; btn.disabled = true;
+      const blob = new Blob(chunks, {type: 'audio/webm'});
+      const durata = Math.round((Date.now() - startTime)/1000);
+      try {
+        await saveRecording(leadId, blob, durata);
+        logActivity(leadId, 'Chiamata registrata ('+Math.floor(durata/60)+':'+(durata%60<10?'0':'')+(durata%60)+')');
+        toast('✓ Registrazione salvata');
+        __rec = null;
+        btn.innerHTML = '🎙️ Registra Chiamata'; btn.disabled = false;
+        await refreshRecordings(leadId);
+        render();
+      } catch(e){
+        alert('Errore salvataggio: '+e.message);
+        btn.innerHTML = '🎙️ Registra Chiamata'; btn.disabled = false;
+        __rec = null;
+      }
+    };
+    recorder.start();
+    btn.classList.add('recording');
+    btn.innerHTML = '⏹️ Stop 0:00';
+  } catch(err){
+    alert('Impossibile accedere al microfono: '+err.message);
+  }
+}
+
+window.addEventListener('beforeunload', (e) => {
+  if (__rec){ e.preventDefault(); e.returnValue = 'Registrazione in corso. Uscire comunque?'; return e.returnValue; }
+});
+
+// ============= SEARCH =============
+let __searchT = null;
+document.getElementById('search').addEventListener('input', (e) => {
+  clearTimeout(__searchT);
+  __searchT = setTimeout(() => {
+    currentFilter.search = e.target.value;
+    renderList();
+  }, 200);
+});
+
+// ============= TOAST =============
+function toast(msg, isErr=false){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show'+(isErr?' err':'');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// Boot
+checkSession();
+</script>
+</body>
+</html>
