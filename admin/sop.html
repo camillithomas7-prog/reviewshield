@@ -5,89 +5,393 @@
 <title>SOP — ReviewShield Admin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.6}
-  body{padding:24px;min-height:100vh}
-  .wrap{max-width:1100px;margin:0 auto}
-  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-  h1{font-size:24px;font-weight:700;color:#10b981}
-  .save-status{font-size:12px;color:#64748b;display:flex;align-items:center;gap:6px}
-  .save-status.saved{color:#10b981}
-  .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-  .btn{background:#1e293b;color:#e2e8f0;border:1px solid #334155;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s}
-  .btn:hover{background:#334155;border-color:#475569}
-  .btn-primary{background:#10b981;border-color:#10b981;color:#fff}
-  .btn-primary:hover{background:#059669;border-color:#059669}
-  .editor{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;min-height:500px;outline:none;font-size:15px;color:#e2e8f0;line-height:1.7}
-  .editor:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
-  .editor h1,.editor h2,.editor h3{color:#10b981;margin:18px 0 8px;font-weight:600}
-  .editor h1{font-size:22px}
-  .editor h2{font-size:18px}
-  .editor h3{font-size:16px}
-  .editor ul,.editor ol{margin:8px 0 8px 24px}
-  .editor li{margin:4px 0}
-  .editor p{margin:6px 0}
-  .editor a{color:#34d399;text-decoration:underline}
-  .editor:empty::before{content:attr(data-placeholder);color:#64748b;pointer-events:none}
-  .hint{font-size:12px;color:#64748b;margin-top:12px}
-  .hint code{background:#1e293b;padding:1px 6px;border-radius:4px;font-family:ui-monospace,monospace;color:#10b981}
+:root{--bg:#030014;--card:rgba(255,255,255,.02);--border:rgba(255,255,255,.05);--primary:#7c3aed;--primary-soft:rgba(124,58,237,.08);--accent:#06b6d4;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--text:rgba(255,255,255,.6);--muted:rgba(255,255,255,.25);--white:#fff;--font:'Inter',-apple-system,system-ui,Segoe UI,Roboto,sans-serif;--cyan:#06b6d4}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;font-size:14px}
+body{padding:24px;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto}
+.doc-badge{display:inline-block;background:rgba(124,58,237,.12);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.05em}
+.page-title{font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.doc-banner{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(6,182,212,.08));border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--text);margin:14px 0 22px;line-height:1.6}
+.doc-banner strong{color:var(--accent);font-weight:700}
+.doc-toc{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin-bottom:30px}
+.doc-toc strong{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.doc-toc ol{margin:0;padding-left:20px;color:var(--text);font-size:13px;line-height:1.9}
+.doc-toc a{color:var(--text);text-decoration:none;transition:color .15s}
+.doc-toc a:hover{color:var(--accent)}
+.doc-h2{font-size:18px;font-weight:700;color:var(--white);margin:28px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--border);scroll-margin-top:20px}
+.doc-h2 .doc-emoji{font-size:18px;margin-right:6px}
+.doc-h3{font-size:14px;font-weight:700;color:var(--white);margin:18px 0 6px}
+.doc-h4{font-size:13px;font-weight:600;color:var(--text);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+.doc-page p{font-size:13px;color:var(--text);line-height:1.7;margin:6px 0 10px}
+.doc-page ul,.doc-page ol{font-size:13px;color:var(--text);line-height:1.7;padding-left:22px;margin:6px 0 12px}
+.doc-page li{margin-bottom:4px}
+.doc-page strong{color:var(--white);font-weight:700}
+.doc-page em{color:var(--muted);font-style:normal;background:rgba(255,255,255,.04);padding:1px 6px;border-radius:4px;font-size:12px}
+.doc-page code{background:rgba(124,58,237,.1);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+.doc-table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.doc-table th{background:rgba(124,58,237,.08);color:var(--white);text-align:left;padding:10px 12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
+.doc-table td{padding:10px 12px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:top}
+.doc-table tr:last-child td{border-bottom:0}
+.doc-quote{background:rgba(34,197,94,.06);border-left:3px solid #22c55e;padding:10px 16px;margin:10px 0;border-radius:6px;font-size:13px;color:var(--text);line-height:1.6;font-style:italic}
+.doc-quote.doc-quote--alert{background:rgba(239,68,68,.06);border-left-color:#ef4444}
+.doc-quote.doc-quote--key{background:rgba(124,58,237,.08);border-left-color:#7c3aed;font-style:normal;font-weight:600}
+.doc-script{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0 14px}
+.doc-script .doc-script__label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:6px;display:block}
+.doc-script .doc-script__text{font-size:13px;color:var(--text);line-height:1.7;font-style:italic}
+.doc-page hr{border:0;border-top:1px solid var(--border);margin:28px 0}
+.doc-page a[href^="#"]{color:var(--accent);text-decoration:none}
+.doc-page a[href^="#"]:hover{text-decoration:underline}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="head">
-    <h1>📋 SOP — Standard Operating Procedures</h1>
-    <span id="status" class="save-status">In attesa di modifiche…</span>
+<div class="doc-page" >
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    
+    <span class="doc-badge">ReviewShield</span>
   </div>
-  <div class="toolbar">
-    <button class="btn" data-cmd="bold" title="Grassetto"><b>B</b></button>
-    <button class="btn" data-cmd="italic" title="Corsivo"><i>I</i></button>
-    <button class="btn" data-cmd="formatBlock" data-value="h2">H2</button>
-    <button class="btn" data-cmd="formatBlock" data-value="h3">H3</button>
-    <button class="btn" data-cmd="insertUnorderedList">• Lista</button>
-    <button class="btn" data-cmd="insertOrderedList">1. Numerata</button>
-    <button class="btn" id="clear">Pulisci formato</button>
-    <button class="btn btn-primary" id="export">Esporta</button>
+  <div class="page-title">📋 SOP — ReviewShield</div>
+  <p class="page-sub">Procedure operative dal lead alla rimozione e all'incasso. Target: chirurghi plastici, medici estetici, dermatologi.</p>
+
+  <div class="doc-banner">
+    <strong>Modello base:</strong> il cliente paga <strong>solo dopo</strong> che la recensione è sparita dal profilo. Mai pagamenti anticipati. Se non riusciamo, costo zero. Questa è la nostra arma di vendita più potente — non si tradisce mai.
   </div>
-  <div id="editor" class="editor" contenteditable="true" data-placeholder="Scrivi qui le tue Standard Operating Procedures…&#10;&#10;Usa la toolbar sopra per formattare il testo. Le modifiche vengono salvate automaticamente nel tuo browser."></div>
-  <div class="hint">💾 Salvataggio automatico in <code>localStorage</code> — i dati restano sul tuo dispositivo. Click su <code>Esporta</code> per scaricare in HTML.</div>
+
+  <div class="doc-toc">
+    <strong>Indice</strong>
+    <ol>
+      <li><a href="#sop-ruoli">Ruoli</a></li>
+      <li><a href="#sop-01">SOP-01 — Assegnazione lead a blocchi</a></li>
+      <li><a href="#sop-02">SOP-02 — Pre-qualifica del profilo Google</a></li>
+      <li><a href="#sop-03">SOP-03 — Primo contatto (telefono / WhatsApp)</a></li>
+      <li><a href="#sop-04">SOP-04 — Registrazione chiamata obbligatoria 🎙</a></li>
+      <li><a href="#sop-05">SOP-05 — Demo / Chiamata di vendita</a></li>
+      <li><a href="#sop-06">SOP-06 — Chiusura e invio link Stripe</a></li>
+      <li><a href="#sop-07">SOP-07 — Passaggio al team operativo</a></li>
+      <li><a href="#sop-08">SOP-08 — Lavorazione e aggiornamenti al cliente</a></li>
+      <li><a href="#sop-09">SOP-09 — Conferma rimozione + incasso</a></li>
+      <li><a href="#sop-10">SOP-10 — Upsell post-vendita</a></li>
+      <li><a href="#sop-11">SOP-11 — Casi limite e contestazioni</a></li>
+      <li><a href="#sop-12">SOP-12 — Reportistica per venditore 📊</a></li>
+      <li><a href="#sop-numeri">Numeri ufficiali da citare</a></li>
+    </ol>
+  </div>
+
+  <h2 class="doc-h2" id="sop-ruoli">Ruoli</h2>
+  <table class="doc-table">
+    <thead><tr><th>Ruolo</th><th>Chi</th><th>Cosa fa</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Owner</strong></td><td>Samuele + Thomas</td><td>Assegna i blocchi di lead, controlla performance, ascolta a campione le chiamate registrate, riceve incassi via Stripe</td></tr>
+      <tr><td><strong>Venditore</strong></td><td>Closer esterno</td><td>Riceve i lead già assegnati, contatta, vende, <strong>registra ogni chiamata</strong></td></tr>
+      <tr><td><strong>Team Analisti / Legale</strong></td><td>Operatori interni</td><td>Costruiscono il dossier tecnico-legale, segnalano a Google</td></tr>
+      <tr><td><strong>Account Manager</strong></td><td>Operatore dedicato</td><td>Aggiorna il cliente ogni 48h, gestisce conferme rimozione</td></tr>
+    </tbody>
+  </table>
+  <p>Sam e Thomas <strong>non parlano mai coi clienti</strong>. Assegnano lead, controllano report, ascoltano a campione chiamate per coaching.</p>
+
+  <h2 class="doc-h2" id="sop-01">SOP-01 — Assegnazione lead a blocchi</h2>
+  <p>I lead vengono assegnati <strong>dal proprietario (Sam) a blocchi</strong>, dalla dashboard <code>reviewshieldita.lovable.app/admin/dashboard</code>. Il venditore <strong>non sceglie</strong> — lavora i lead che gli vengono assegnati.</p>
+
+  <h3 class="doc-h3">Procedura assegnazione (lato Sam)</h3>
+  <ol>
+    <li>Sam apre la dashboard.</li>
+    <li>Filtra i lead per priorità:
+      <ul>
+        <li><strong>ALTA</strong>: rating Google tra <strong>3.5 e 4.3</strong> (zona dove ogni recensione negativa pesa di più).</li>
+        <li><strong>MEDIA</strong>: rating tra 4.4 e 4.6, almeno 3 recensioni 1-2 stelle.</li>
+        <li><strong>BASSA</strong>: rating ≥ 4.7 (utile per Monitoraggio Continuo).</li>
+      </ul>
+    </li>
+    <li>Seleziona un blocco di <strong>20–50 lead</strong>.</li>
+    <li>Assegna il blocco a un venditore specifico.</li>
+    <li>Il venditore vedrà nella sua dashboard SOLO i lead a lui assegnati.</li>
+  </ol>
+
+  <h3 class="doc-h3">Procedura lavorazione (lato venditore)</h3>
+  <ol>
+    <li>Il venditore apre la dashboard, vede solo i suoi lead.</li>
+    <li>Stati possibili per ogni lead:
+      <ul>
+        <li><code>Da contattare</code> (default)</li>
+        <li><code>Contattato — in attesa risposta</code></li>
+        <li><code>Demo fissata</code></li>
+        <li><code>Demo fatta — in attesa decisione</code></li>
+        <li><code>Chiuso</code> (vendita andata)</li>
+        <li><code>Rifiutato</code></li>
+        <li><code>Non risponde / Numero errato</code></li>
+      </ul>
+    </li>
+    <li>Il venditore aggiorna lo stato dopo ogni interazione.</li>
+    <li><strong>Tempistica</strong>: ogni lead assegnato dev'essere lavorato (almeno primo contatto) entro <strong>48 ore</strong>.</li>
+  </ol>
+
+  <h2 class="doc-h2" id="sop-02">SOP-02 — Pre-qualifica del profilo Google</h2>
+  <p>Da fare <strong>prima di chiamare</strong>, ogni volta. Tempo: 5–7 minuti per profilo.</p>
+  <ol>
+    <li>Apri il profilo Google del medico (Maps o Search).</li>
+    <li>Conta le recensioni 1 e 2 stelle degli ultimi 12 mesi.</li>
+    <li>Per ogni recensione negativa, classifica:
+      <ul>
+        <li><strong>Prematura</strong> → scritta a giorni/settimane da un intervento che dà risultato a mesi.</li>
+        <li><strong>Dati medici esposti</strong> → cita interventi, complicazioni, condizioni → violazione privacy.</li>
+        <li><strong>Diffamatoria</strong> → "truffatore", "incompetente", "mi ha rovinato".</li>
+        <li><strong>Sospetta competitor</strong> → account creato di recente, una sola recensione, profilo vuoto.</li>
+        <li><strong>Aspettativa irrealistica</strong> → "volevo il naso di Belen", lavoro tecnicamente perfetto.</li>
+        <li><strong>Altro / non rimovibile</strong> → critiche generiche e fondate.</li>
+      </ul>
+    </li>
+    <li>Calcola il <strong>danno stimato</strong> con la formula sotto.</li>
+    <li>Scegli 2–3 recensioni "facili" da mostrare in chiamata come esempio concreto.</li>
+    <li>Salva tutto in una nota interna sul lead.</li>
+  </ol>
+
+  <h3 class="doc-h3">Formula del danno (da usare in chiamata)</h3>
+  <div class="doc-quote doc-quote--key">
+    Pazienti persi al mese (stima) × Valore medio paziente × 12 = Danno annuo
+  </div>
+  <p><strong>Esempio chirurgo plastico</strong>: 2 pazienti/mese × 5.000 € = <strong>10.000 €/mese persi</strong> → 120.000 €/anno → <strong>600.000 € in 5 anni</strong>.</p>
+  <p><strong>Esempio medico estetico</strong>: 4 pazienti/mese × 800 € = <strong>3.200 €/mese persi</strong> → 38.400 €/anno.</p>
+  <p>👉 Questa è l'arma principale. Il prezzo (€300/recensione) sembra niente confrontato al danno.</p>
+
+  <h2 class="doc-h2" id="sop-03">SOP-03 — Primo contatto (telefono / WhatsApp)</h2>
+  <p><strong>Canale preferito</strong>: telefono diretto allo studio. <strong>Orari</strong>: martedì-giovedì, 10:00–12:00 e 15:00–17:00.</p>
+  <p><strong>⚠ PRIMA DI CHIAMARE</strong>: premere il bottone <strong>🔴 Registra Chiamata</strong> nella scheda lead (vedi SOP-04).</p>
+
+  <div class="doc-script">
+    <span class="doc-script__label">Apertura standard (15 secondi)</span>
+    <div class="doc-script__text">"Buongiorno, sono [nome] di ReviewShield. Mi sono permesso di chiamare perché ho appena guardato il profilo Google del Dr. [Cognome] e ho visto che ci sono recensioni che secondo le policy Google sono rimovibili. Posso parlargli 2 minuti o richiamare in un altro momento?"</div>
+  </div>
+
+  <div class="doc-script">
+    <span class="doc-script__label">Se non passa la segretaria</span>
+    <div class="doc-script__text">"Ho letto le recensioni del dottore e ne ho identificate 3 che possono essere rimosse legalmente da Google. Lo dica al dottore. Le lascio il mio numero — sono [nome], +39 XXX. La richiamata è gratuita e di interesse del dottore."</div>
+  </div>
+
+  <p>Se risponde direttamente il medico: vai a <strong>SOP-05</strong>. Per WhatsApp ed email: vedi <a href="#" onclick="window.parent.location.href='#script'">Script Vendita</a>.</p>
+
+  <h2 class="doc-h2" id="sop-04"><span class="doc-emoji">🎙</span>SOP-04 — Registrazione chiamata obbligatoria</h2>
+  <div class="doc-quote doc-quote--alert">
+    <strong>TUTTE le chiamate vengono registrate. Senza eccezioni.</strong> Se un venditore aggiorna lo stato senza aver registrato, è imbroglio — verifica immediata.
+  </div>
+
+  <h3 class="doc-h3">Come funziona</h3>
+  <ol>
+    <li>Dentro la scheda di ogni lead, c'è il bottone <strong>🔴 Registra Chiamata</strong>.</li>
+    <li>Il venditore lo preme <strong>prima</strong> di chiamare il medico.</li>
+    <li>La registrazione parte dal PC: cattura il microfono e l'audio della chiamata (se in conference / VoIP).</li>
+    <li>Al termine, click su <strong>⏹ Stop</strong> → il file audio si salva automaticamente collegato al lead.</li>
+    <li>Sam e Thomas possono riascoltare quando vogliono per controllo qualità, coaching, verifica fatti.</li>
+  </ol>
+
+  <h3 class="doc-h3">Disclosure obbligatoria al cliente (per legge)</h3>
+  <div class="doc-script">
+    <span class="doc-script__label">Da dire all'inizio di ogni chiamata</span>
+    <div class="doc-script__text">"Dottore, le segnalo che questa chiamata può essere registrata per fini di qualità e formazione. Se non è d'accordo me lo dica, fermo la registrazione."</div>
+  </div>
+  <p>In pratica nessuno dice di no se viene chiesto in modo professionale. Ma va detto sempre — sennò siamo fuori legge.</p>
+
+  <h3 class="doc-h3">File audio</h3>
+  <ul>
+    <li>Si salvano automaticamente nella scheda del lead.</li>
+    <li>Non vanno scaricati, condivisi, mandati a terzi.</li>
+    <li>Restano sul server reviewshield per <strong>12 mesi minimo</strong>.</li>
+  </ul>
+
+  <h2 class="doc-h2" id="sop-05">SOP-05 — Demo / Chiamata di vendita</h2>
+  <p>Durata target: <strong>15–20 minuti</strong>. Struttura completa con script in <a href="#" onclick="window.parent.location.href='#script'">Script Vendita</a>.</p>
+  <ol>
+    <li><strong>Empatia</strong> (2 min) — riconosci il dolore: "Quanto le pesa quella recensione?"</li>
+    <li><strong>Calcolo del danno</strong> (3 min) — usa la formula di SOP-02. Il prezzo dopo questo step sembra ridicolo.</li>
+    <li><strong>Soluzione</strong> (5 min) — chi siamo, come funzioniamo:
+      <ul>
+        <li>Team analisti + team legale + account manager dedicato</li>
+        <li>88% successo, 10 giorni medi (alcune in 48h)</li>
+        <li>900+ recensioni eliminate, 200+ cliniche, 7 anni di attività</li>
+        <li>5 policy Google sfruttate</li>
+        <li>0 accessi al profilo, 0 credenziali richieste</li>
+      </ul>
+    </li>
+    <li><strong>Garanzia</strong> (1 min):
+      <div class="doc-quote doc-quote--key">"Lei paga SOLO dopo che la recensione è sparita. Se non riusciamo, costo zero. Il rischio è tutto nostro."</div>
+    </li>
+    <li><strong>Prezzi</strong> (3 min) — vai a SOP-06.</li>
+    <li><strong>Chiusura</strong> (2 min) — invio link Stripe.</li>
+  </ol>
+  <p><strong>Mostrare in chiamata</strong> via WhatsApp:</p>
+  <ul>
+    <li>Case study Bologna: 9 recensioni rimosse, rating 3.6 → 4.7 in 12 giorni.</li>
+    <li>Case study Milano: recensione di 2 anni, rimossa in 6 giorni.</li>
+  </ul>
+
+  <h2 class="doc-h2" id="sop-06">SOP-06 — Chiusura e invio link Stripe</h2>
+  <h3 class="doc-h3">Listino ufficiale</h3>
+  <table class="doc-table">
+    <thead><tr><th>Pacchetto</th><th>Prezzo</th><th>Quando proporlo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pulizia Singola</strong></td><td>€300 / recensione</td><td>1–3 recensioni da rimuovere</td></tr>
+      <tr><td><strong>Pacchetto 10</strong></td><td>€240 / recensione (sconto 20%)</td><td>4+ recensioni</td></tr>
+      <tr><td><strong>Monitoraggio Continuo</strong></td><td>€100 / mese</td><td>Sempre, come upsell o per profili "sani" che vogliono prevenzione</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="doc-h3">Procedura invio link Stripe</h3>
+  <ol>
+    <li>Venditore raccoglie: nome esatto attività + URL profilo Google + email + WhatsApp.</li>
+    <li>Venditore richiede a Sam/Thomas il <strong>link Stripe corretto</strong> (one-shot per pulizia, subscription per monitoraggio).</li>
+    <li>Sam/Thomas generano il link e lo girano al venditore.</li>
+    <li>Venditore inoltra al cliente con questo testo:
+      <div class="doc-script">
+        <div class="doc-script__text">"Dottore, come da accordo le mando il link Stripe. <strong>Non lo paghi adesso</strong> — apriamo il caso, rimuoviamo le recensioni, e quando le vede sparite saldano il link. Se non riusciamo, il link non viene mai pagato. Ci siamo?"</div>
+      </div>
+    </li>
+    <li>Venditore aggiorna stato lead in dashboard: <code>Chiuso — Stripe inviato</code>.</li>
+  </ol>
+
+  <div class="doc-quote doc-quote--alert">
+    <strong>REGOLA FERREA</strong>: il cliente <strong>non paga prima della rimozione</strong>. Mai. È il nostro principale argomento di vendita — non si tradisce.
+  </div>
+
+  <h2 class="doc-h2" id="sop-07">SOP-07 — Passaggio al team operativo</h2>
+  <p>Una volta accettato l'accordo e inviato lo Stripe, il venditore prepara il <strong>brief operativo</strong>:</p>
+  <pre style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11.5px;color:var(--text);font-family:ui-monospace,Menlo,monospace;line-height:1.6;overflow-x:auto;white-space:pre-wrap">NUOVO CASO — ReviewShield
+
+Cliente: Dr. [Nome Cognome]
+Attività: [Nome esatto attività]
+URL Google: [link profilo]
+Città: [città]
+Email: [email]
+WhatsApp: [+39 ...]
+
+Recensioni da rimuovere ([N] totali):
+1. [URL recensione] — Autore: [nome] — Motivo: [policy violata] — Screenshot: [link]
+2. ...
+
+Pacchetto venduto: [Singola / Pacchetto 10 / Monitoraggio]
+Importo: € [totale]
+Stripe link: [URL] — stato: inviato, NON pagato
+
+Note venditore: [contesto utile, sensibilità, urgenze]</pre>
+  <p>Team operativo prende in carico entro <strong>24 ore</strong> e contatta il cliente con email di benvenuto firmata dall'account manager.</p>
+
+  <h2 class="doc-h2" id="sop-08">SOP-08 — Lavorazione e aggiornamenti al cliente</h2>
+  <p>Tempistica standard: <strong>10 giorni lavorativi</strong> (alcune cadono in 48h).</p>
+  <h3 class="doc-h3">Checkpoint obbligatori</h3>
+  <ul>
+    <li><strong>Giorno 0</strong>: email di benvenuto dell'account manager con timeline prevista.</li>
+    <li><strong>Giorno 2</strong>: aggiornamento "abbiamo costruito il dossier per recensioni X, Y, Z e abbiamo segnalato".</li>
+    <li><strong>Giorno 5</strong>: aggiornamento di stato (anche se "ancora in lavorazione").</li>
+    <li><strong>Giorno 10</strong>: aggiornamento finale — quante rimosse, quante in lavorazione, quante non eliminabili.</li>
+  </ul>
+  <p>Tono: professionale, pacato, mai trionfalistico finché la recensione non è sparita. Quando è sparita: screenshot prima/dopo come prova.</p>
+  <p>Se il caso supera i 14 giorni: l'account manager fa una <strong>telefonata</strong> per spiegare lo stato senza far sentire abbandonato il cliente.</p>
+
+  <h2 class="doc-h2" id="sop-09">SOP-09 — Conferma rimozione + incasso</h2>
+  <p>Quando una recensione sparisce dal profilo Google:</p>
+  <ol>
+    <li>Account manager verifica con due controlli a 24h di distanza (cache).</li>
+    <li>Salva screenshot <strong>prima</strong> (preso al momento della vendita) e <strong>dopo</strong>.</li>
+    <li>Invia email al cliente con prova + sollecito pagamento Stripe.</li>
+    <li>Notifica Sam/Thomas: "Cliente X — rimossa, sollecitato pagamento Stripe".</li>
+    <li>Sam/Thomas controllano lo Stripe entro <strong>48h</strong>. Se non pagato → SOP-11.</li>
+  </ol>
+  <p><strong>Subscription Monitoraggio</strong>: il primo addebito parte dal mese successivo alla prima rimozione confermata.</p>
+
+  <h2 class="doc-h2" id="sop-10">SOP-10 — Upsell post-vendita</h2>
+  <p>A <strong>7 giorni</strong> dalla rimozione, l'account manager propone:</p>
+  <ul>
+    <li>Cliente con singole pagate → <strong>Pacchetto 10</strong> scontato per recensioni future.</li>
+    <li>Cliente senza Monitoraggio → <strong>Monitoraggio Continuo €100/mese</strong> con questo angolo:
+      <div class="doc-quote">"Dottore, oggi lei è pulito. Ma il problema può ripresentarsi: bastano 1–2 recensioni nuove e siamo punto a capo. Con il Monitoraggio le copriamo TUTTE le recensioni future automaticamente, lei non deve nemmeno chiamare. 100 euro al mese e dorme tranquillo."</div>
+    </li>
+  </ul>
+  <p><strong>KPI minimo upsell</strong>: 30% dei clienti pulizia singola deve attivare Monitoraggio entro 30 giorni.</p>
+
+  <h2 class="doc-h2" id="sop-11">SOP-11 — Casi limite e contestazioni</h2>
+
+  <h3 class="doc-h3">Caso A — Cliente non paga lo Stripe dopo rimozione</h3>
+  <ol>
+    <li>Account manager invia 1° sollecito (giorno +3): "Le ricordo gentilmente il link Stripe ancora aperto."</li>
+    <li>Account manager invia 2° sollecito (giorno +7): tono fermo ma cortese.</li>
+    <li>Sam/Thomas inviano sollecito formale (giorno +14): via PEC se disponibile.</li>
+    <li>Se non paga entro 30 giorni: passaggio a recupero crediti.</li>
+  </ol>
+
+  <h3 class="doc-h3">Caso B — Recensione rimossa che riappare</h3>
+  <p>La rimuoviamo <strong>gratis</strong> (è dichiarato sulla landing). Apri nuovo dossier, segnala nuovamente, comunica al cliente: "ce ne occupiamo noi senza costi aggiuntivi".</p>
+
+  <h3 class="doc-h3">Caso C — Recensioni che non riusciamo a rimuovere</h3>
+  <p>Comunica al cliente con onestà: "questa rientra nelle critiche fondate, Google non la rimuoverà. Possiamo lavorare sulle altre N rimovibili." Costo per quelle non rimosse: <strong>zero</strong>.</p>
+
+  <h3 class="doc-h3">Caso D — Cliente vuole indietro i soldi dopo aver pagato</h3>
+  <p>Il pagamento Stripe è dovuto in cambio del risultato già consegnato. Mostrare screenshot prima/dopo, contratto/email di conferma. In caso di chargeback: contestare con la documentazione + audio della chiamata di vendita registrata.</p>
+
+  <h3 class="doc-h3">Caso E — Recensione che il cliente ritiene rimovibile, ma non lo è</h3>
+  <p>Fai un'analisi onesta in fase di vendita: meglio dirlo prima che dopo. Se ti accorgi solo dopo: comunica al cliente, non addebitare nulla per quella, lavora solo su quelle effettivamente rimovibili.</p>
+
+  <h2 class="doc-h2" id="sop-12"><span class="doc-emoji">📊</span>SOP-12 — Reportistica per venditore</h2>
+  <p>Sam e Thomas controllano la dashboard ogni settimana per vedere come stanno performando i venditori. Ogni venditore vede solo i propri numeri.</p>
+
+  <h3 class="doc-h3">KPI per venditore</h3>
+  <table class="doc-table">
+    <thead><tr><th>KPI</th><th>Cosa misura</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lead assegnati</strong></td><td>Quanti lead ha avuto in carico nel periodo</td><td>—</td></tr>
+      <tr><td><strong>Lead contattati</strong></td><td>Quanti ha effettivamente chiamato</td><td>≥ 90% degli assegnati</td></tr>
+      <tr><td><strong>Chiamate registrate</strong></td><td>Quante chiamate ha registrato</td><td>= numero contatti</td></tr>
+      <tr><td><strong>Tasso di risposta</strong></td><td>Hanno risposto / contattati</td><td>≥ 40%</td></tr>
+      <tr><td><strong>Demo fissate</strong></td><td>Quante chiamate sono diventate appuntamenti</td><td>≥ 25% dei contattati</td></tr>
+      <tr><td><strong>Demo fatte</strong></td><td>Quante demo si sono concluse</td><td>≥ 80% delle fissate</td></tr>
+      <tr><td><strong>Vendite chiuse</strong></td><td>Quanti accordi conclusi</td><td>≥ 20% delle demo</td></tr>
+      <tr><td><strong>Fatturato generato</strong></td><td>Totale € incassati via Stripe</td><td>—</td></tr>
+      <tr><td><strong>Tempo medio chiamata</strong></td><td>Durata media (da audio registrato)</td><td>5–12 min</td></tr>
+      <tr><td><strong>Lead "freddi"</strong></td><td>Lead in pancia non lavorati &gt; 7 giorni</td><td>0</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="doc-h3">Frequenza review</h3>
+  <ul>
+    <li><strong>Giornaliera</strong>: Sam dà un occhio veloce ai numeri di ieri.</li>
+    <li><strong>Settimanale (lunedì)</strong>: review 1-on-1 con ogni venditore. Aprire 2-3 chiamate registrate scelte a caso, ascoltare, dare feedback.</li>
+    <li><strong>Mensile</strong>: classifica venditori, premio/bonus al top performer, eventuali tagli di chi è sotto target da 2+ mesi consecutivi.</li>
+  </ul>
+
+  <h3 class="doc-h3">Indicatori di allarme (Sam interviene subito)</h3>
+  <ul>
+    <li>Venditore con &lt; 50% lead contattati su quelli assegnati → <strong>blocco assegnazioni nuove</strong> fino a recupero.</li>
+    <li>Venditore con 0 chiamate registrate ma stati aggiornati → <strong>possibile imbroglio</strong>, ascoltare a campione.</li>
+    <li>Tasso di rifiuto &gt; 70% → problema di approccio, fare coaching.</li>
+    <li>Tempo medio chiamata &lt; 3 min su demo → non sta vendendo, sta scappando dalle obiezioni.</li>
+  </ul>
+
+  <h2 class="doc-h2" id="sop-numeri">Numeri ufficiali da citare</h2>
+  <p>Da memorizzare e ripetere SEMPRE in chiamata. Sono i numeri della landing — non si inventano.</p>
+  <table class="doc-table">
+    <thead><tr><th>Metrica</th><th>Valore</th></tr></thead>
+    <tbody>
+      <tr><td>Tasso di successo</td><td><strong>88%</strong></td></tr>
+      <tr><td>Recensioni eliminate (totale storico)</td><td><strong>900+</strong></td></tr>
+      <tr><td>Cliniche e studi serviti</td><td><strong>200+</strong></td></tr>
+      <tr><td>Tempo medio di rimozione</td><td><strong>10 giorni</strong> lavorativi (alcune in 48h)</td></tr>
+      <tr><td>Anni di attività nel settore</td><td><strong>7 anni</strong></td></tr>
+      <tr><td>Anni esperienza team legale</td><td><strong>12+ anni</strong></td></tr>
+      <tr><td>Risposta entro</td><td><strong>2 ore</strong></td></tr>
+      <tr><td>Policy Google sfruttate</td><td><strong>5</strong> (Contenuto Fuorviante, Privacy, Conflitto di Interessi, Diffamazione, Spam)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="doc-h3">Trust badges (da ripetere a chiusura)</h3>
+  <ul>
+    <li>✅ Paghi solo dopo la rimozione</li>
+    <li>✅ Zero pagamenti anticipati</li>
+    <li>✅ 100% legale e conforme</li>
+    <li>✅ Nessun accesso al profilo</li>
+  </ul>
+
+  <hr>
+  <p style="font-size:11px;color:var(--muted);text-align:center">Per integrazioni o feedback dal campo: parlare con Samuele o Thomas.</p>
 </div>
-<script>
-const ed=document.getElementById('editor');
-const st=document.getElementById('status');
-const KEY='reviewshield_sop_html';
-
-ed.innerHTML=localStorage.getItem(KEY)||'';
-
-let saveTimer;
-const save=()=>{
-  st.textContent='Salvataggio…';st.classList.remove('saved');
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    localStorage.setItem(KEY,ed.innerHTML);
-    const t=new Date().toLocaleTimeString('it-IT');
-    st.textContent='✓ Salvato '+t;st.classList.add('saved');
-  },400);
-};
-ed.addEventListener('input',save);
-
-document.querySelectorAll('.btn[data-cmd]').forEach(b=>{
-  b.addEventListener('click',e=>{
-    e.preventDefault();
-    document.execCommand(b.dataset.cmd,false,b.dataset.value||null);
-    ed.focus();save();
-  });
-});
-document.getElementById('clear').addEventListener('click',()=>{
-  document.execCommand('removeFormat');ed.focus();save();
-});
-document.getElementById('export').addEventListener('click',()=>{
-  const blob=new Blob(['<!DOCTYPE html><meta charset="UTF-8"><title>SOP ReviewShield</title><body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px">'+ed.innerHTML+'</body>'],{type:'text/html'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='reviewshield-sop-'+new Date().toISOString().slice(0,10)+'.html';
-  a.click();
-});
-</script>
+</div>
 </body>
 </html>
