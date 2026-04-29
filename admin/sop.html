@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>SOP — ReviewShield Admin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.6}
+  body{padding:24px;min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  h1{font-size:24px;font-weight:700;color:#10b981}
+  .save-status{font-size:12px;color:#64748b;display:flex;align-items:center;gap:6px}
+  .save-status.saved{color:#10b981}
+  .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .btn{background:#1e293b;color:#e2e8f0;border:1px solid #334155;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s}
+  .btn:hover{background:#334155;border-color:#475569}
+  .btn-primary{background:#10b981;border-color:#10b981;color:#fff}
+  .btn-primary:hover{background:#059669;border-color:#059669}
+  .editor{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;min-height:500px;outline:none;font-size:15px;color:#e2e8f0;line-height:1.7}
+  .editor:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+  .editor h1,.editor h2,.editor h3{color:#10b981;margin:18px 0 8px;font-weight:600}
+  .editor h1{font-size:22px}
+  .editor h2{font-size:18px}
+  .editor h3{font-size:16px}
+  .editor ul,.editor ol{margin:8px 0 8px 24px}
+  .editor li{margin:4px 0}
+  .editor p{margin:6px 0}
+  .editor a{color:#34d399;text-decoration:underline}
+  .editor:empty::before{content:attr(data-placeholder);color:#64748b;pointer-events:none}
+  .hint{font-size:12px;color:#64748b;margin-top:12px}
+  .hint code{background:#1e293b;padding:1px 6px;border-radius:4px;font-family:ui-monospace,monospace;color:#10b981}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>📋 SOP — Standard Operating Procedures</h1>
+    <span id="status" class="save-status">In attesa di modifiche…</span>
+  </div>
+  <div class="toolbar">
+    <button class="btn" data-cmd="bold" title="Grassetto"><b>B</b></button>
+    <button class="btn" data-cmd="italic" title="Corsivo"><i>I</i></button>
+    <button class="btn" data-cmd="formatBlock" data-value="h2">H2</button>
+    <button class="btn" data-cmd="formatBlock" data-value="h3">H3</button>
+    <button class="btn" data-cmd="insertUnorderedList">• Lista</button>
+    <button class="btn" data-cmd="insertOrderedList">1. Numerata</button>
+    <button class="btn" id="clear">Pulisci formato</button>
+    <button class="btn btn-primary" id="export">Esporta</button>
+  </div>
+  <div id="editor" class="editor" contenteditable="true" data-placeholder="Scrivi qui le tue Standard Operating Procedures…&#10;&#10;Usa la toolbar sopra per formattare il testo. Le modifiche vengono salvate automaticamente nel tuo browser."></div>
+  <div class="hint">💾 Salvataggio automatico in <code>localStorage</code> — i dati restano sul tuo dispositivo. Click su <code>Esporta</code> per scaricare in HTML.</div>
+</div>
+<script>
+const ed=document.getElementById('editor');
+const st=document.getElementById('status');
+const KEY='reviewshield_sop_html';
+
+ed.innerHTML=localStorage.getItem(KEY)||'';
+
+let saveTimer;
+const save=()=>{
+  st.textContent='Salvataggio…';st.classList.remove('saved');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    localStorage.setItem(KEY,ed.innerHTML);
+    const t=new Date().toLocaleTimeString('it-IT');
+    st.textContent='✓ Salvato '+t;st.classList.add('saved');
+  },400);
+};
+ed.addEventListener('input',save);
+
+document.querySelectorAll('.btn[data-cmd]').forEach(b=>{
+  b.addEventListener('click',e=>{
+    e.preventDefault();
+    document.execCommand(b.dataset.cmd,false,b.dataset.value||null);
+    ed.focus();save();
+  });
+});
+document.getElementById('clear').addEventListener('click',()=>{
+  document.execCommand('removeFormat');ed.focus();save();
+});
+document.getElementById('export').addEventListener('click',()=>{
+  const blob=new Blob(['<!DOCTYPE html><meta charset="UTF-8"><title>SOP ReviewShield</title><body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px">'+ed.innerHTML+'</body>'],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='reviewshield-sop-'+new Date().toISOString().slice(0,10)+'.html';
+  a.click();
+});
+</script>
+</body>
+</html>
