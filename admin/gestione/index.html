@@ -758,40 +758,74 @@ function renderLeadCard(l){
   const log = m.log || [];
   const nrCount = m.nr_count || 0;
   const negRevs = Array.isArray(l.negative_reviews) ? l.negative_reviews : [];
-  const ratingStr = l.rating ? `⭐ ${Number(l.rating).toFixed(1)} (${l.total_reviews||0})` : '—';
+  const ratingStr = l.rating ? `⭐ ${Number(l.rating).toFixed(1)} (${l.total_reviews||0})` : '<span style="color:var(--muted)">—</span>';
+  const businessTypes = Array.isArray(l.business_types) ? l.business_types : [];
+  const cityFull = [l.city, l.province ? '('+l.province+')' : '', l.region].filter(Boolean).join(' ');
   const tags = [
     `<span class="${opt.class}">${opt.label}</span>`,
     nrCount>0 ? `<span class="tag red">NR ${nrCount}</span>` : '',
     team ? `<span class="tag pur">${team.toUpperCase()}</span>` : '',
     negRevs.length>0 ? `<span class="tag red">${negRevs.length} REC. NEG.</span>` : '',
     l.has_website===false ? `<span class="tag yel">NO SITO</span>` : '',
+    l.has_website===true ? `<span class="tag cyn">SITO ATTIVO</span>` : '',
+    l.business_status && l.business_status !== 'OPERATIONAL' ? `<span class="tag org">${escapeHtml(l.business_status)}</span>` : '',
+    l.category ? `<span class="tag gray">${escapeHtml(l.category)}</span>` : '',
+    l.price_level ? `<span class="tag gray">${'€'.repeat(Math.min(4, l.price_level))}</span>` : '',
   ].filter(Boolean).join('');
-  const negBlock = negRevs.length > 0 ? `
-    <div class="neg-rev">
-      <div class="nr-head">${negRevs.length} recensione/i negativa/e</div>
-      ${negRevs.slice(0,2).map(r => `
-        <div>${'⭐'.repeat(Math.max(1, Math.min(5, Number(r.rating)||1)))} <strong>${escapeHtml(r.author||r.author_name||'')}</strong>: ${escapeHtml((r.text||'').slice(0,180))}${(r.text||'').length>180?'…':''}</div>
-      `).join('')}
+
+  // Worst review highlight
+  const worstBlock = (l.worst_review_text || l.worst_review_author) ? `
+    <div class="neg-rev" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25)">
+      <div class="nr-head">⚠️ Peggior recensione (target principale)</div>
+      <div>${l.worst_review_rating ? '⭐'.repeat(Math.max(1, Math.min(5, Number(l.worst_review_rating)||1))) : ''} <strong>${escapeHtml(l.worst_review_author||'Anonimo')}</strong>: ${escapeHtml(l.worst_review_text||'(testo non disponibile)')}</div>
     </div>
   ` : '';
+
+  // All negative reviews
+  const negBlock = negRevs.length > 0 ? `
+    <div class="neg-rev">
+      <div class="nr-head">${negRevs.length} recensione/i negativa/e totali</div>
+      ${negRevs.slice(0,5).map(r => `
+        <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(239,68,68,.08)">
+          ${'⭐'.repeat(Math.max(1, Math.min(5, Number(r.rating)||1)))}
+          <strong>${escapeHtml(r.author||r.author_name||'Anonimo')}</strong>
+          ${r.date||r.relative_time ? `<span style="color:var(--muted);font-size:10px">· ${escapeHtml(r.date||r.relative_time)}</span>` : ''}
+          : ${escapeHtml((r.text||'(senza testo)').slice(0,250))}${(r.text||'').length>250?'…':''}
+        </div>
+      `).join('')}
+      ${negRevs.length > 5 ? `<div style="font-size:10px;color:var(--muted);font-style:italic">…e altre ${negRevs.length-5} recensioni negative</div>` : ''}
+    </div>
+  ` : '';
+
+  // Date info
+  const movedAt = l._movedAt ? '· spostato '+fmtDate(l._movedAt) : '';
+  const oldestRev = l.oldest_review_date ? `· prima recensione ${fmtDate(l.oldest_review_date)}` : '';
+
   return `
     <div class="lead s-${status}" id="lead-${l.id}">
       <div class="lead-row">
-        <div class="lead-name"><span class="icn">📞</span>${escapeHtml(l.business_name||'—')}</div>
+        <div>
+          <div class="lead-name"><span class="icn">📞</span>${escapeHtml(l.business_name||'—')}</div>
+          ${businessTypes.length ? `<div style="font-size:10px;color:var(--muted);margin-top:3px;margin-left:24px">${businessTypes.slice(0,4).map(t => escapeHtml(t.replace(/_/g,' '))).join(' · ')}</div>` : ''}
+        </div>
         <div class="lead-meta">
           <div class="id">#${(l.id||'').toString().slice(-6)}</div>
-          <div>${fmtDate(l.created_at)}</div>
+          <div>creato ${fmtDate(l.created_at)}</div>
+          <div style="font-size:10px">${movedAt} ${oldestRev}</div>
         </div>
       </div>
       <div class="lead-info">
-        <div class="field"><span class="lbl">Telefono</span><span class="val">${l.phone ? `<a href="tel:${escapeHtml(l.phone)}">${escapeHtml(l.phone)}</a>` : '—'}</span></div>
-        <div class="field"><span class="lbl">Città</span><span class="val">${escapeHtml((l.city||'')+(l.province?' ('+l.province+')':''))||'—'}</span></div>
-        <div class="field"><span class="lbl">Sito</span><span class="val">${l.website ? `<a href="${escapeHtml(l.website)}" target="_blank" rel="noopener">${escapeHtml((l.website||'').replace(/^https?:\/\//,'').slice(0,40))}</a>` : '<span style="color:var(--muted)">—</span>'}</span></div>
-        <div class="field"><span class="lbl">Rating</span><span class="val">${ratingStr}</span></div>
+        <div class="field"><span class="lbl">Telefono</span><span class="val">${l.phone ? `<a href="tel:${escapeHtml(l.phone)}">${escapeHtml(l.phone)}</a>` : '<span style="color:var(--muted)">—</span>'}</span></div>
+        <div class="field"><span class="lbl">Città / Regione</span><span class="val">${escapeHtml(cityFull)||'<span style="color:var(--muted)">—</span>'}</span></div>
         <div class="field"><span class="lbl">Indirizzo</span><span class="val">${escapeHtml(l.address||'—')}</span></div>
-        <div class="field"><span class="lbl">Maps</span><span class="val">${l.google_maps_url ? `<a href="${escapeHtml(l.google_maps_url)}" target="_blank" rel="noopener">Apri Google Maps</a>` : '—'}</span></div>
+        <div class="field"><span class="lbl">Sito web</span><span class="val">${l.website ? `<a href="${escapeHtml(l.website)}" target="_blank" rel="noopener">${escapeHtml((l.website||'').replace(/^https?:\/\//,'').slice(0,45))}${(l.website||'').length>45?'…':''}</a>` : '<span style="color:var(--muted)">— nessun sito</span>'}</span></div>
+        <div class="field"><span class="lbl">Rating Google</span><span class="val">${ratingStr}${l.worst_review_rating ? ` · peggio: ⭐${l.worst_review_rating}` : ''}</span></div>
+        <div class="field"><span class="lbl">Recensioni negative</span><span class="val">${negRevs.length>0 ? `<span style="color:var(--red);font-weight:700">${negRevs.length} negative</span> · ${l.total_reviews||0} totali` : (l.total_reviews? l.total_reviews+' recensioni totali' : '<span style="color:var(--muted)">—</span>')}</span></div>
+        <div class="field"><span class="lbl">Maps</span><span class="val">${l.google_maps_url ? `<a href="${escapeHtml(l.google_maps_url)}" target="_blank" rel="noopener">Apri su Google Maps ↗</a>` : '<span style="color:var(--muted)">—</span>'}</span></div>
+        <div class="field"><span class="lbl">Foto / Place ID</span><span class="val" style="font-size:10px">${l.photos_count||0} foto · <code style="background:rgba(255,255,255,.04);padding:1px 4px;border-radius:3px;font-size:9px">${escapeHtml((l.google_place_id||'').slice(0,18))}${l.google_place_id?'…':'—'}</code></span></div>
       </div>
       <div class="tags">${tags}</div>
+      ${worstBlock}
       ${negBlock}
       <textarea class="notes" data-id="${l.id}" placeholder="Note sul lead…">${escapeHtml(l.notes||'')}</textarea>
       <div class="row-actions">
