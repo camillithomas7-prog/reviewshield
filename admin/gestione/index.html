@@ -371,53 +371,59 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 });
 
 // ============= LOAD LEADS =============
-const ASSIGNED_KEY = 'rs_assigned_leads';
-function getAssignedSet(){
-  try { return new Set(JSON.parse(localStorage.getItem(ASSIGNED_KEY)||'[]')); }
-  catch(e){ return new Set(); }
+// Leads are now MOVED (not just referenced): full lead objects live in localStorage.
+// rs_assigned_leads_data = { [leadId]: { ...full lead row, _movedAt } }
+const STORAGE_KEY = 'rs_assigned_leads_data';
+const LEGACY_KEY = 'rs_assigned_leads';
+
+function getMap(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); }
+  catch(e){ return {}; }
 }
-function saveAssignedSet(set){
-  localStorage.setItem(ASSIGNED_KEY, JSON.stringify([...set]));
+function saveMap(m){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(m));
 }
-function removeFromAssigned(id){
-  const s = getAssignedSet();
-  s.delete(id);
-  saveAssignedSet(s);
+function updateLeadLocal(id, patch){
+  const m = getMap();
+  if (m[id]){ Object.assign(m[id], patch); saveMap(m); }
+}
+function removeFromMap(id){
+  const m = getMap();
+  delete m[id];
+  saveMap(m);
 }
 
 async function loadLeads(){
+  // Migrate legacy id-only key (if present, just clear it)
+  if (localStorage.getItem(LEGACY_KEY)) localStorage.removeItem(LEGACY_KEY);
+
   const list = document.getElementById('lead-list');
-  const assigned = getAssignedSet();
-  if (assigned.size === 0){
+  const map = getMap();
+  const items = Object.values(map);
+  if (items.length === 0){
     list.innerHTML = `
       <div class="empty">
         <span>📭</span>
         <div style="font-size:14px;color:var(--text-strong);font-weight:600;margin-bottom:6px">Nessun lead in gestione</div>
-        <div style="margin-bottom:14px">Vai su <strong>Lead Salvati</strong> e usa il pulsante <strong>"Importa primi 50 / 100"</strong> per trasferire qui i lead da gestire attivamente.</div>
+        <div style="margin-bottom:14px">Vai su <strong>Lead Salvati</strong> e usa la barra <strong>"Sposta N lead → Gestione"</strong> per spostare qui i lead da gestire attivamente.<br><br>I lead spostati spariranno da Lead Salvati e vivranno qui finché non li ripristini.</div>
         <a href="/admin/dashboard/" style="display:inline-block;background:var(--primary);color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">← Vai a Lead Salvati</a>
       </div>`;
     allLeads = [];
     renderStats(); renderPills(); renderTeamPills(); renderReminders();
     return;
   }
-  list.innerHTML = '<div class="empty">⏳ Caricamento lead…</div>';
-  const ids = [...assigned];
-  // Supabase REST: filter by id IN (...)
-  const { data, error } = await sb.from('leads').select('*').in('id', ids).order('created_at', { ascending: false });
-  if (error){
-    list.innerHTML = '<div class="empty"><span>⚠️</span>'+error.message+'</div>';
-    return;
-  }
-  allLeads = data || [];
-  // Auto-clean orphans (assigned ids not found in DB anymore)
-  const found = new Set((data||[]).map(l => l.id));
-  const orphans = ids.filter(id => !found.has(id));
-  if (orphans.length){
-    const s = getAssignedSet();
-    orphans.forEach(id => s.delete(id));
-    saveAssignedSet(s);
-  }
+  // Sort by _movedAt desc (most recent first), fallback to created_at
+  items.sort((a,b) => new Date(b._movedAt||b.created_at||0) - new Date(a._movedAt||a.created_at||0));
+  allLeads = items;
   render();
+}
+
+// ===== Restore one lead back to Lead Salvati (Supabase) =====
+async function restoreLead(lead){
+  const row = Object.assign({}, lead);
+  delete row._movedAt;
+  const { error } = await sb.from('leads').upsert(row, { onConflict: 'id' });
+  if (error){ throw new Error(error.message); }
 }
 
 // ============= RENDER =============
@@ -673,7 +679,7 @@ function renderLeadCard(l){
         ${l.phone ? `<a class="btn wa" href="${waLink(l.phone)}" target="_blank" rel="noopener">📱 WhatsApp</a>` : ''}
         <button class="btn btn-rec" data-id="${l.id}">🎙️ Registra Chiamata</button>
         <span style="flex:1"></span>
-        <button class="btn del btn-remove" data-id="${l.id}" title="Rimuovi dal pannello Gestione (il lead originale resta in Lead Salvati)">✕ Rimuovi da gestione</button>
+        <button class="btn del btn-remove" data-id="${l.id}" title="Riporta il lead in Lead Salvati (lo rimette su Supabase con stato e note attuali)">↩ Riporta in Lead Salvati</button>
       </div>
       <div class="recordings" data-id="${l.id}"><div class="rec-empty">Nessuna registrazione</div></div>
       <div class="log">${log.length===0 ? '<em style="color:var(--muted)">Nessuna attività</em>' : log.slice(0,8).map(e => `${fmtDate(e.ts)} · ${escapeHtml(e.by||'')} · ${escapeHtml(e.text||'')}`).join('<br>')}</div>
@@ -708,13 +714,12 @@ function wireLead(l){
     }
     setMgmt(l.id, m);
 
-    // Save status & notes to Supabase
+    // Save status & notes locally (lead is no longer in Supabase)
     if (status !== oldStatus || notes !== oldNotes){
-      const upd = {};
-      if (status !== oldStatus){ upd.status = status; logActivity(l.id, 'Stato: '+statusOption(oldStatus).label+' → '+statusOption(status).label); }
-      if (notes !== oldNotes){ upd.notes = notes; logActivity(l.id, 'Nota aggiornata'); }
-      const { error } = await sb.from('leads').update(upd).eq('id', l.id);
-      if (error){ toast('Errore salvataggio: '+error.message, true); return; }
+      const patch = {};
+      if (status !== oldStatus){ patch.status = status; logActivity(l.id, 'Stato: '+statusOption(oldStatus).label+' → '+statusOption(status).label); }
+      if (notes !== oldNotes){ patch.notes = notes; logActivity(l.id, 'Nota aggiornata'); }
+      updateLeadLocal(l.id, patch);
       l.status = status;
       l.notes = notes;
     }
@@ -725,12 +730,21 @@ function wireLead(l){
   card.querySelector('.btn-rec').addEventListener('click', (e) => toggleRec(l.id, e.currentTarget));
   const remBtn = card.querySelector('.btn-remove');
   if (remBtn){
-    remBtn.addEventListener('click', () => {
-      if (!confirm('Rimuovere questo lead dal pannello Gestione?\n\nIl lead originale resta in "Lead Salvati" — viene rimosso solo dalla lista di gestione attiva.')) return;
-      removeFromAssigned(l.id);
-      allLeads = allLeads.filter(x => x.id !== l.id);
-      render();
-      toast('✓ Rimosso dalla gestione');
+    remBtn.addEventListener('click', async () => {
+      if (!confirm('Riportare questo lead in "Lead Salvati"?\n\nIl lead tornerà nella lista principale, con stato e note attuali. Le registrazioni vocali restano qui.')) return;
+      remBtn.disabled = true;
+      remBtn.innerHTML = '⏳ Ripristino…';
+      try {
+        await restoreLead(l);
+        removeFromMap(l.id);
+        allLeads = allLeads.filter(x => x.id !== l.id);
+        render();
+        toast('✓ Riportato in Lead Salvati');
+      } catch(e){
+        toast('Errore: '+e.message, true);
+        remBtn.disabled = false;
+        remBtn.innerHTML = '↩ Riporta in Lead Salvati';
+      }
     });
   }
 }
