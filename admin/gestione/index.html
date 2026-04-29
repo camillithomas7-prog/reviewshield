@@ -47,15 +47,62 @@ body{padding:18px 22px 80px}
 .brand-title{font-size:15px;font-weight:800;color:var(--white)}
 .brand-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a{padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;font-weight:600}
-.nav a:hover{color:var(--white);border-color:rgba(124,58,237,.4)}
-.nav a.active{background:var(--primary-soft);color:var(--accent);border-color:rgba(124,58,237,.3)}
+.nav a, .nav .tab-btn{padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;font-weight:600;cursor:pointer;font-family:inherit}
+.nav a:hover, .nav .tab-btn:hover{color:var(--white);border-color:rgba(124,58,237,.4)}
+.nav a.active, .nav .tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Team view */
+.team-gate{display:flex;justify-content:center;padding:60px 20px}
+.team-gate-card{max-width:380px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px;text-align:center}
+.team-gate-card h2{color:var(--white);font-size:18px;font-weight:800;margin-bottom:6px}
+.team-gate-card p{font-size:12px;color:var(--muted);margin-bottom:18px}
+.team-gate-card input{width:100%;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:inherit;font-size:14px;text-align:center;letter-spacing:3px;margin-bottom:6px}
+.team-gate-card input:focus{outline:none;border-color:var(--primary)}
+.team-gate-card .err{color:var(--red);font-size:12px;min-height:16px;margin-bottom:8px}
+.team-gate-card button{width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.team-gate-card button:hover{background:#6d28d9}
+.team-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.team-header h2{color:var(--white);font-size:18px;font-weight:800;margin-bottom:4px}
+.team-header p{font-size:12px;color:var(--muted)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:14px}
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.team-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.team-card .name{font-size:15px;font-weight:800;color:var(--white)}
+.team-card .stats{font-size:11px;color:var(--muted);margin-top:2px}
+.team-card .del{background:transparent;border:1px solid var(--border);color:var(--muted);width:24px;height:24px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;line-height:1}
+.team-card .del:hover{color:var(--red);border-color:var(--red)}
+.team-card .ore{display:flex;align-items:center;gap:6px;margin-top:8px}
+.team-card .ore label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.team-card .ore input{width:70px;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);border-radius:6px;font-family:inherit;font-size:12px}
+.team-card .ore button{padding:6px 12px;background:var(--primary);color:#fff;border:0;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.team-card .quota{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px}
+.team-card .quota .pct{color:var(--accent);font-weight:700}
+.team-card .quota .open{color:var(--muted)}
+.team-add{display:flex;gap:8px;margin-bottom:14px}
+.team-add input{flex:1;padding:10px 14px;background:var(--card);border:1px solid var(--border);color:var(--white);border-radius:8px;font-family:inherit;font-size:13px}
+.team-add button{padding:10px 18px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.kpi-period{display:flex;gap:6px;margin-bottom:14px}
+.kpi-period-btn{padding:6px 14px;background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.kpi-period-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.kpi-card .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.kpi-card .name{font-size:15px;font-weight:800;color:var(--white)}
+.kpi-card .total{font-size:11px;color:var(--muted);font-weight:700}
+.kpi-card .row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;color:var(--text-strong)}
+.kpi-card .row .ok{color:var(--green);font-weight:700}
+.kpi-card .row .warn{color:var(--orange);font-weight:700}
+.kpi-card .row .err{color:var(--red);font-weight:700}
+.kpi-card .row .info{color:var(--accent);font-weight:700}
+.kpi-card .ratio{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted)}
+.kpi-card .ratio strong{color:var(--accent);font-size:13px}
+.kpi-card .ratio .muted{color:rgba(255,255,255,.25);font-size:10px}
 .user-bar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
 .user-bar button{background:transparent;color:var(--muted);border:1px solid var(--border);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
 .user-bar button:hover{color:var(--red);border-color:rgba(239,68,68,.3)}
 
 /* Stats */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;margin-bottom:14px}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;cursor:pointer;transition:border-color .15s;font-family:inherit}
 .stat:hover{border-color:rgba(124,58,237,.3)}
 .stat.active{border-color:var(--primary);background:var(--primary-soft)}
@@ -195,9 +242,10 @@ body{padding:18px 22px 80px}
         </div>
       </div>
       <div class="nav">
+        <button class="tab-btn active" data-view="lead">📋 Lead</button>
+        <button class="tab-btn" data-view="team">👥 Team</button>
         <a href="/admin/dashboard/">🗺 Mappa</a>
-        <a href="/admin/dashboard/">📋 Lead Salvati</a>
-        <a href="/admin/gestione/" class="active">⚡ Gestione</a>
+        <a href="/admin/dashboard/">💾 Lead Salvati</a>
         <a href="/admin/dashboard/">💬 Template WA</a>
         <a href="/admin/sop.html">📘 SOP</a>
         <a href="/admin/script-vendita.html">🎬 Script</a>
@@ -208,22 +256,66 @@ body{padding:18px 22px 80px}
       </div>
     </div>
 
-    <div class="reminder-bar" id="reminder-bar">
-      <h3>📞 Da chiamare adesso</h3>
-      <div id="reminder-list"></div>
+    <!-- ===== LEAD VIEW ===== -->
+    <div id="view-lead">
+      <div class="reminder-bar" id="reminder-bar">
+        <h3>📞 Da chiamare adesso</h3>
+        <div id="reminder-list"></div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="pill-row" id="status-pills"></div>
+      <div class="pill-row" id="team-pills"></div>
+
+      <div class="search-bar">
+        <input id="search" placeholder="🔎 Cerca per nome, telefono, città, sito…">
+      </div>
+
+      <div class="lead-list" id="lead-list">
+        <div class="empty">⏳ Caricamento lead…</div>
+      </div>
     </div>
 
-    <div class="stats" id="stats"></div>
+    <!-- ===== TEAM VIEW ===== -->
+    <div id="view-team" style="display:none">
+      <!-- Password gate -->
+      <div id="team-gate" class="team-gate">
+        <div class="team-gate-card">
+          <div style="font-size:36px;margin-bottom:8px">🔒</div>
+          <h2>Sezione Riservata</h2>
+          <p>Inserisci la password per accedere al pannello Team</p>
+          <input type="password" id="team-pwd" autofocus>
+          <div class="err" id="team-pwd-err"></div>
+          <button id="team-pwd-btn">Accedi</button>
+        </div>
+      </div>
+      <!-- Team management content -->
+      <div id="team-content" style="display:none">
+        <div class="team-header">
+          <div>
+            <h2>Gestione Operatori</h2>
+            <p>Imposta le ore settimanali di ogni operatore. Le KPI vengono calcolate dai lead in Gestione.</p>
+          </div>
+          <button class="btn" id="team-lock-btn">🔒 Blocca</button>
+        </div>
 
-    <div class="pill-row" id="status-pills"></div>
-    <div class="pill-row" id="team-pills"></div>
+        <div class="team-grid" id="team-grid"></div>
 
-    <div class="search-bar">
-      <input id="search" placeholder="🔎 Cerca per nome, telefono, città…">
-    </div>
+        <form class="team-add" id="team-add-form" onsubmit="event.preventDefault();return false">
+          <input type="text" id="op-name-input" placeholder="Nome operatore...">
+          <button type="button" id="op-add-btn">+ Aggiungi</button>
+        </form>
 
-    <div class="lead-list" id="lead-list">
-      <div class="empty">⏳ Caricamento lead…</div>
+        <h2 style="margin:28px 0 4px">📊 Performance Operatori</h2>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">KPI calcolati sui lead in gestione, periodo selezionato</p>
+        <div class="kpi-period">
+          <button class="kpi-period-btn active" data-period="all">Tutto</button>
+          <button class="kpi-period-btn" data-period="30">Ultimi 30gg</button>
+          <button class="kpi-period-btn" data-period="7">Ultimi 7gg</button>
+        </div>
+        <div class="kpi-grid" id="kpi-grid"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -237,7 +329,38 @@ const SUPABASE_URL = 'https://amxoxllnhcgprmfrmnho.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFteG94bGxuaGNncHJtZnJtbmhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MTMxNjQsImV4cCI6MjA5MDk4OTE2NH0.60JGHtG7bCFevYyJr-q2Og9poNbT1QUnZZCYBT6E2c8';
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: true, autoRefreshToken: true } });
 
-const TEAMS = ['samuele', 'thomas'];
+// ============= OPERATORS =============
+const OPERATORS_KEY = 'rs_operators';
+function getOperators(){
+  try {
+    const raw = localStorage.getItem(OPERATORS_KEY);
+    if (!raw){
+      const seed = [
+        { id: 1, nome: 'samuele', ore_settimanali: 20, created_at: new Date().toISOString() },
+        { id: 2, nome: 'thomas',  ore_settimanali: 20, created_at: new Date().toISOString() }
+      ];
+      localStorage.setItem(OPERATORS_KEY, JSON.stringify(seed));
+      return seed;
+    }
+    return JSON.parse(raw);
+  } catch(e){ return []; }
+}
+function saveOperators(ops){ localStorage.setItem(OPERATORS_KEY, JSON.stringify(ops)); }
+function addOperator(nome){
+  const ops = getOperators();
+  const id = ops.length ? Math.max(...ops.map(o => o.id||0))+1 : 1;
+  ops.push({ id, nome: nome.trim().toLowerCase(), ore_settimanali: 0, created_at: new Date().toISOString() });
+  saveOperators(ops);
+}
+function removeOperator(id){
+  saveOperators(getOperators().filter(o => o.id !== id));
+}
+function updateOperatorOre(id, ore){
+  const ops = getOperators();
+  const op = ops.find(o => o.id === id);
+  if (op){ op.ore_settimanali = Math.max(0, parseInt(ore)||0); saveOperators(ops); }
+}
+function getTeamNames(){ return getOperators().map(o => o.nome); }
 const STATUS_OPTIONS = [
   { value: 'da_contattare',   label: 'Da contattare',   class: 'tag gray',  pillColor: 'c-blue' },
   { value: 'da_ricontattare', label: 'Da ricontattare', class: 'tag org',   pillColor: 'c-org'  },
@@ -250,6 +373,9 @@ const STATUS_OPTIONS = [
 ];
 
 let allLeads = [];
+let currentView = 'lead';
+let teamUnlocked = false;
+let kpiPeriod = 'all';
 let currentUser = null;
 let currentFilter = { status: null, team: null, search: '' };
 
@@ -559,14 +685,16 @@ function renderPills(){
 
 function renderTeamPills(){
   const el = document.getElementById('team-pills');
-  const counts = { samuele: 0, thomas: 0 };
+  const teams = getTeamNames();
+  const counts = {};
+  teams.forEach(t => counts[t] = 0);
   allLeads.forEach(l => {
     const t = getMgmt(l.id).team;
     if (t && counts[t] !== undefined) counts[t]++;
   });
   el.innerHTML = `
     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;align-self:center;margin-right:6px">Team:</span>
-    ${TEAMS.map(t => `
+    ${teams.map(t => `
       <button class="pill team-pill ${currentFilter.team === t ? 'active' : ''}" data-team="${t}">
         ${t.charAt(0).toUpperCase()+t.slice(1)} (${counts[t]||0})
       </button>
@@ -672,7 +800,7 @@ function renderLeadCard(l){
         </select>
         <select class="sel-team" data-id="${l.id}">
           <option value="">— team —</option>
-          ${TEAMS.map(t => `<option value="${t}" ${team===t?'selected':''}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join('')}
+          ${getTeamNames().map(t => `<option value="${t}" ${team===t?'selected':''}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join('')}
         </select>
         <input type="datetime-local" class="inp-reminder" data-id="${l.id}" value="${reminder ? reminder.slice(0,16) : ''}" title="Prossimo contatto">
         <button class="btn save-meta" data-id="${l.id}">💾 Salva</button>
@@ -856,6 +984,202 @@ function toast(msg, isErr=false){
   el.textContent = msg;
   el.className = 'toast show'+(isErr?' err':'');
   setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ============= VIEW SWITCHER =============
+const TEAM_PWD = '123';
+const TEAM_SESSION_KEY = 'rs_team_unlocked';
+
+function switchView(v){
+  currentView = v;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  document.getElementById('view-lead').style.display = v === 'lead' ? '' : 'none';
+  document.getElementById('view-team').style.display = v === 'team' ? '' : 'none';
+  if (v === 'team') renderTeamView();
+}
+
+function renderTeamView(){
+  // Check if previously unlocked in this session
+  if (sessionStorage.getItem(TEAM_SESSION_KEY) === '1') teamUnlocked = true;
+  document.getElementById('team-gate').style.display = teamUnlocked ? 'none' : '';
+  document.getElementById('team-content').style.display = teamUnlocked ? '' : 'none';
+  if (teamUnlocked){
+    renderOperators();
+    renderKPI();
+  }
+}
+
+document.querySelectorAll('.tab-btn').forEach(b => {
+  b.addEventListener('click', () => switchView(b.dataset.view));
+});
+
+document.getElementById('team-pwd-btn').addEventListener('click', () => {
+  const v = document.getElementById('team-pwd').value;
+  if (v === TEAM_PWD){
+    teamUnlocked = true;
+    sessionStorage.setItem(TEAM_SESSION_KEY, '1');
+    document.getElementById('team-pwd').value = '';
+    document.getElementById('team-pwd-err').textContent = '';
+    renderTeamView();
+  } else {
+    document.getElementById('team-pwd-err').textContent = 'Password errata';
+  }
+});
+document.getElementById('team-pwd').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('team-pwd-btn').click();
+});
+document.getElementById('team-lock-btn').addEventListener('click', () => {
+  teamUnlocked = false;
+  sessionStorage.removeItem(TEAM_SESSION_KEY);
+  renderTeamView();
+});
+
+// ============= OPERATORS UI =============
+function renderOperators(){
+  const grid = document.getElementById('team-grid');
+  const ops = getOperators();
+  const totalOre = ops.reduce((sum, o) => sum + (parseInt(o.ore_settimanali)||0), 0);
+  const map = getMap();
+  const leadsArr = Object.values(map);
+  // Stats per operator
+  const opStats = {};
+  ops.forEach(o => {
+    const myLeads = leadsArr.filter(l => (getMgmt(l.id).team||'') === o.nome);
+    const closed = myLeads.filter(l => ['convertito','non_interessato','numero_sbagliato'].includes(l.status||'da_contattare')).length;
+    const open = myLeads.length - closed;
+    opStats[o.nome] = { totali: myLeads.length, chiusi: closed, aperti: open };
+  });
+  if (ops.length === 0){
+    grid.innerHTML = '<div class="empty" style="padding:20px">Nessun operatore aggiunto</div>';
+    return;
+  }
+  grid.innerHTML = ops.map(o => {
+    const ore = parseInt(o.ore_settimanali)||0;
+    const pct = totalOre > 0 ? Math.round(ore / totalOre * 100) : 0;
+    const s = opStats[o.nome] || { totali:0, chiusi:0, aperti:0 };
+    return `
+      <div class="team-card">
+        <div class="top">
+          <div>
+            <div class="name">${escapeHtml(o.nome)}</div>
+            <div class="stats">${s.totali} lead · ${s.chiusi} chiusi</div>
+          </div>
+          <button class="del" data-op-del="${o.id}" title="Rimuovi">×</button>
+        </div>
+        <div class="ore">
+          <label>Ore/sett</label>
+          <input type="number" min="0" max="168" value="${ore}" data-op-ore="${o.id}">
+          <button data-op-save="${o.id}">Salva</button>
+        </div>
+        <div class="quota">
+          <span class="pct">Quota: ${pct}%</span>
+          <span class="open">Aperti: ${s.aperti}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  grid.querySelectorAll('[data-op-del]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (!confirm('Rimuovere questo operatore?')) return;
+      removeOperator(parseInt(b.dataset.opDel));
+      renderOperators(); renderKPI();
+      render(); // refresh team pills in lead view
+    });
+  });
+  grid.querySelectorAll('[data-op-save]').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = parseInt(b.dataset.opSave);
+      const inp = grid.querySelector('[data-op-ore="'+id+'"]');
+      updateOperatorOre(id, inp.value);
+      toast('✓ Salvato');
+      renderOperators();
+    });
+  });
+}
+
+document.getElementById('op-add-btn').addEventListener('click', () => {
+  const inp = document.getElementById('op-name-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  addOperator(v);
+  inp.value = '';
+  renderOperators();
+  renderKPI();
+  render(); // refresh team pills
+});
+document.getElementById('op-name-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('op-add-btn').click();
+});
+
+// ============= KPI =============
+document.querySelectorAll('.kpi-period-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    kpiPeriod = b.dataset.period;
+    document.querySelectorAll('.kpi-period-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderKPI();
+  });
+});
+
+function inPeriod(iso, period){
+  if (period === 'all' || !iso) return true;
+  const days = parseInt(period);
+  const since = Date.now() - days*86400000;
+  return new Date(iso).getTime() >= since;
+}
+
+function renderKPI(){
+  const grid = document.getElementById('kpi-grid');
+  const ops = getOperators();
+  if (ops.length === 0){ grid.innerHTML = '<div class="empty" style="padding:30px;background:var(--card);border-radius:12px">Nessun operatore. Aggiungine uno qui sopra per vedere le KPI.</div>'; return; }
+  const map = getMap();
+  const leadsArr = Object.values(map);
+
+  grid.innerHTML = ops.map(o => {
+    const myLeads = leadsArr.filter(l => (getMgmt(l.id).team||'') === o.nome && inPeriod(l._movedAt||l.created_at, kpiPeriod));
+    const k = {
+      totali: myLeads.length,
+      da_contattare: 0, da_ricontattare: 0, non_risponde: 0,
+      interessato: 0, demo_avviata: 0, convertito: 0,
+      non_interessato: 0, numero_sbagliato: 0,
+    };
+    myLeads.forEach(l => {
+      const s = l.status || 'da_contattare';
+      if (k[s] !== undefined) k[s]++;
+    });
+    const chiamati = k.totali - k.da_contattare;
+    const tot = Math.max(1, k.totali);
+    const pct = (n) => k.totali>0 ? Math.round(n/tot*100) : 0;
+    const tasso_chiamata = k.totali>0 ? Math.round(chiamati/k.totali*100) : 0;
+    const tasso_conferma = chiamati>0 ? Math.round(k.convertito/chiamati*100) : 0;
+    const tasso_qualifica = k.totali>0 ? Math.round((k.interessato+k.demo_avviata+k.convertito)/k.totali*100) : 0;
+
+    return `
+      <div class="kpi-card">
+        <div class="head">
+          <div class="name">${escapeHtml(o.nome)}</div>
+          <div class="total">${k.totali} lead totali</div>
+        </div>
+        ${k.totali === 0 ? `
+          <div style="padding:14px 0;text-align:center;color:var(--muted);font-size:11px">Nessun lead nel periodo</div>
+        ` : `
+          <div class="row"><span>Da contattare</span><span class="warn">${k.da_contattare} (${pct(k.da_contattare)}%)</span></div>
+          <div class="row"><span>Chiamati</span><span>${chiamati} (${pct(chiamati)}%)</span></div>
+          <div class="row"><span>Da ricontattare</span><span class="warn">${k.da_ricontattare} (${pct(k.da_ricontattare)}%)</span></div>
+          <div class="row"><span>Non risponde</span><span class="err">${k.non_risponde} (${pct(k.non_risponde)}%)</span></div>
+          <div class="row"><span>Interessati</span><span class="info">${k.interessato} (${pct(k.interessato)}%)</span></div>
+          <div class="row"><span>Demo avviate</span><span class="info">${k.demo_avviata} (${pct(k.demo_avviata)}%)</span></div>
+          <div class="row"><span>Convertiti</span><span class="ok">${k.convertito} (${pct(k.convertito)}%)</span></div>
+          <div class="row"><span>Non interessati</span><span>${k.non_interessato} (${pct(k.non_interessato)}%)</span></div>
+          <div class="row"><span>N. sbagliato</span><span class="err">${k.numero_sbagliato} (${pct(k.numero_sbagliato)}%)</span></div>
+          <div class="ratio">
+            <div>Tasso chiamata: <strong>${tasso_chiamata}%</strong> <span class="muted">chiamati / totali</span></div>
+            <div>Tasso qualifica: <strong>${tasso_qualifica}%</strong> <span class="muted">interess.+demo+conv / totali</span></div>
+            <div>Tasso conversione: <strong>${tasso_conferma}%</strong> <span class="muted">convertiti / chiamati</span></div>
+          </div>
+        `}
+      </div>
+    `;
+  }).join('');
 }
 
 // Boot
